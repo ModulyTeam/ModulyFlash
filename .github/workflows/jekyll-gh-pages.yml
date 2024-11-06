@@ -1,0 +1,38 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Puedes cambiar la rama si lo prefieres
+  workflow_dispatch:  # Permite ejecutar manualmente desde la pestaña de Actions
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Paso 1: Obtener el código del repositorio
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Paso 2: Configurar el entorno (si es necesario)
+    - name: Set up Node.js (solo si necesitas compilación, si no, puedes eliminar este paso)
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Ajusta la versión si es necesario
+
+    # Paso 3: Compilar (solo si necesitas compilar o hacer un build, si no, puedes saltar este paso)
+    - name: Build (opcional, elimina si no es necesario)
+      run: |
+        cd frontend
+        # Si tienes algún proceso de compilación o build, agrégalo aquí (como npm run build o cualquier otro)
+        # Ejemplo:
+        # npm install
+        # npm run build
+
+    # Paso 4: Desplegar el contenido de la carpeta `frontend` a GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: frontend  # Carpeta donde está el index.html
+        github_token: ${{ secrets.GITHUB_TOKEN }}
