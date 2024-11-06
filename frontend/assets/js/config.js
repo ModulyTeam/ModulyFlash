@@ -1,0 +1,1 @@
+const API_URL = 'http://coquettecraft.duckdns.org:5500/api';

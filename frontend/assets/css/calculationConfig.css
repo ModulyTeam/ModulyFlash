@@ -1,0 +1,63 @@
+.days-config-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.days-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.days-option {
+    position: relative;
+    padding: 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.days-option:hover {
+    border-color: var(--secondary-color);
+    background: white;
+}
+
+.days-option input[type="radio"] {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+}
+
+.days-option label {
+    display: block;
+    cursor: pointer;
+    padding-right: 2.5rem;
+}
+
+.days-option h4 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.days-option p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.days-option input[type="radio"]:checked + label h4 {
+    color: var(--secondary-color);
+}
+
+.calculation-config {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #e9ecef;
+    border-radius: 4px;
+    font-size: 0.9rem;
+} 

@@ -1,0 +1,31 @@
+proyecto/
+├── backend/
+│   ├── config/
+│   │   └── db.js
+│   ├── controllers/
+│   │   ├── userController.js
+│   │   ├── bankController.js
+│   │   └── documentController.js
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Bank.js
+│   │   └── Document.js
+│   ├── routes/
+│   │   ├── userRoutes.js
+│   │   ├── bankRoutes.js
+│   │   └── documentRoutes.js
+│   ├── middleware/
+│   │   └── auth.js
+│   └── server.js
+├── frontend/
+│   ├── assets/
+│   │   ├── css/
+│   │   │   └── styles.css
+│   │   ├── js/
+│   │   │   ├── auth.js
+│   │   │   ├── banks.js
+│   │   │   ├── documents.js
+│   │   │   └── portfolio.js
+│   │   └── img/
+│   └── index.html
+└── package.json 

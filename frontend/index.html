@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Financiera</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/methodSelector.css">
+    <link rel="stylesheet" href="assets/css/calculationConfig.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/5.1.0/introjs.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Section -->
+        <section id="auth-section" class="section">
+            <div class="auth-container">
+                <div id="login-form">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginForm">
+                        <input type="text" placeholder="Usuario" id="loginUsername" required>
+                        <input type="password" placeholder="Contraseña" id="loginPassword" required>
+                        <button type="submit">Ingresar</button>
+                    </form>
+                    <p>¿No tienes cuenta? <a href="#" id="showRegister">Regístrate</a></p>
+                </div>
+                
+                <div id="register-form" style="display: none;">
+                    <h2>Registro</h2>
+                    <form id="registerForm">
+                        <input type="text" placeholder="Usuario" id="registerUsername" required>
+                        <input type="password" placeholder="Contraseña" id="registerPassword" required>
+                        <button type="submit">Registrar</button>
+                    </form>
+                    <p>¿Ya tienes cuenta? <a href="#" id="showLogin">Inicia Sesión</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main App Section -->
+        <section id="main-section" class="section" style="display: none;">
+            <nav>
+                <ul>
+                    <li><a href="/" data-section="home">Inicio</a></li>
+                    <li><a href="#documents" data-section="documents">Documentos</a></li>
+                    <li><a href="#banks" data-section="banks">Bancos</a></li>
+                    <li><a href="#portfolio" data-section="portfolio">Cartera de Descuento</a></li>
+                    <li><a href="#" id="logout">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+
+            <div id="content">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts en orden correcto -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/calculationConfig.js"></script>
+    <script src="assets/js/calculationMethods.js"></script>
+    <script src="assets/js/calculationFunctions.js"></script>
+    <script src="assets/js/discountCalculator.js"></script>
+    <script src="assets/js/portfolioCalculations.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/banks.js"></script>
+    <script src="assets/js/documents.js"></script>
+    <script src="assets/js/portfolio.js"></script>
+    <script src="assets/js/portfolioTutorial.js"></script>
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.20/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/5.1.0/intro.min.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/tutorialManager.js"></script>
+</body>
+</html> 
