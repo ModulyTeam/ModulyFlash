@@ -189,36 +189,46 @@ window.addEventListener('hashchange', handleRoute);
 window.addEventListener('load', handleRoute);
 
 function handleRoute() {
+    console.log('Manejando ruta:', window.location.pathname);
     const content = document.getElementById('content');
-    const hash = window.location.hash;
     const path = window.location.pathname;
 
-    // Limpiar contenido actual
-    content.innerHTML = '';
+    if (!content) {
+        console.error('No se encontró el elemento content');
+        return;
+    }
+
+    // Asegurarnos de que portfolioManager exista
+    if (path === '/portfolio' && !window.portfolioManager) {
+        window.portfolioManager = new PortfolioManager();
+    }
 
     // Manejar rutas
-    if (path === '/' && !hash) {
-        showWelcome();
-    } else {
-        switch(hash) {
-            case '#documents':
-                documentManager.loadDocuments();
-                break;
-            case '#banks':
-                bankManager.loadBanks();
-                break;
-            case '#portfolio':
-                portfolioManager.loadPortfolio();
-                break;
-            default:
-                showWelcome();
-        }
+    switch(path) {
+        case '/portfolio':
+            if (window.portfolioManager) {
+                window.portfolioManager.loadPortfolio();
+            } else {
+                console.error('No se pudo inicializar portfolioManager');
+            }
+            break;
+        case '/documents':
+            documentManager.loadDocuments();
+            break;
+        case '/banks':
+            bankManager.loadBanks();
+            break;
+        case '/':
+        default:
+            showWelcome();
     }
 }
 
-// Manejar clic en el enlace de inicio
-document.querySelector('nav a[data-section="home"]').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.history.pushState({}, '', '/');
-    showWelcome();
+// Asegurarse de que el evento DOMContentLoaded maneje la ruta inicial
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('token')) {
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('main-section').style.display = 'block';
+        handleRoute();
+    }
 }); 

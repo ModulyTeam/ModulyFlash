@@ -1,4 +1,5 @@
 const Document = require('../models/Document');
+const Bank = require('../models/Bank');
 
 exports.createDocument = async (req, res) => {
   try {
@@ -33,86 +34,82 @@ exports.getDocuments = async (req, res) => {
 };
 
 exports.calculatePortfolio = async (req, res) => {
-  try {
-    const { selectedDate, documents, calculationType, daysInYear } = req.body;
+    try {
+        const { selectedDate, documents, calculationType, daysInYear, bankId } = req.body;
 
-    const calculations = await Promise.all(documents.map(async (docData) => {
-      const doc = await Document.findOne({
-        _id: docData.documentId,
-        userId: req.user.userId
-      }).populate('bankId');
+        // Obtener el banco seleccionado una sola vez
+        const bank = await Bank.findById(bankId);
+        if (!bank) {
+            throw new Error('Banco no encontrado');
+        }
 
-      if (!doc) throw new Error(`Documento no encontrado: ${docData.documentId}`);
+        const calculations = await Promise.all(documents.map(async (docData) => {
+            const doc = await Document.findOne({
+                _id: docData.documentId,
+                userId: req.user.userId
+            });
 
-      const originalAmount = doc.unit * doc.unitPrice;
-      const daysToMaturity = Math.floor((new Date(doc.dueDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
-      const daysToSelected = Math.floor((new Date(selectedDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
-      const daysFromSelectedToMaturity = Math.floor((new Date(doc.dueDate) - new Date(selectedDate)) / (1000 * 60 * 60 * 24));
-      
-      // Cálculo del valor futuro usando TCEA
-      const futureValue = originalAmount * Math.pow(1 + (doc.tcea/100), daysToMaturity/daysInYear);
-      const futureValueAtSelected = originalAmount * Math.pow(1 + (doc.tcea/100), daysToSelected/daysInYear);
-      
-      // Determinar la tasa de descuento a usar
-      const discountRate = doc.bankId ? doc.bankId.discountRate : docData.customDiscountRate;
-      if (!discountRate && discountRate !== 0) {
-        throw new Error(`Tasa de descuento no disponible para documento ${doc.code}`);
-      }
+            if (!doc) throw new Error(`Documento no encontrado: ${docData.documentId}`);
 
-      // Determinar el monto a descontar según el método seleccionado
-      let amountToDiscount;
-      switch(calculationType) {
-        case 'original':
-          amountToDiscount = originalAmount;
-          break;
-        case 'futureAtSelected':
-          amountToDiscount = futureValueAtSelected;
-          break;
-        case 'future':
-        default:
-          amountToDiscount = futureValue;
-          break;
-      }
+            const originalAmount = doc.unit * doc.unitPrice;
+            const daysToMaturity = Math.floor((new Date(doc.dueDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
+            const daysToSelected = Math.floor((new Date(selectedDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
+            const daysFromSelectedToMaturity = Math.floor((new Date(doc.dueDate) - new Date(selectedDate)) / (1000 * 60 * 60 * 24));
 
-      // Cálculo del valor descontado
-      const discountedValue = amountToDiscount / Math.pow(1 + (discountRate/100), daysFromSelectedToMaturity/daysInYear);
-      
-      return {
-        documentCode: doc.code,
-        bank: doc.bankId ? doc.bankId.name : 'Sin banco',
-        currency: doc.currency,
-        originalAmount,
-        futureValue,
-        futureValueAtSelected,
-        discountedValue,
-        amountToDiscount,
-        daysToMaturity,
-        daysToSelected,
-        daysFromSelectedToMaturity,
-        tcea: doc.tcea,
-        discountRate,
-        unit: doc.unit,
-        unitPrice: doc.unitPrice,
-        calculationType,
-        daysInYear,
-      };
-    }));
+            // Usar la tasa de descuento del banco seleccionado
+            const discountRate = bank.discountRate;
 
-    const totals = calculations.reduce((acc, curr) => ({
-      originalAmount: acc.originalAmount + curr.originalAmount,
-      futureValue: acc.futureValue + curr.futureValue,
-      discountedValue: acc.discountedValue + curr.discountedValue
-    }), { originalAmount: 0, futureValue: 0, discountedValue: 0 });
+            // Cálculo del valor futuro usando TCEA
+            const futureValue = originalAmount * Math.pow(1 + (doc.tcea/100), daysToMaturity/daysInYear);
+            const futureValueAtSelected = originalAmount * Math.pow(1 + (doc.tcea/100), daysToSelected/daysInYear);
+            
+            // Determinar el monto a descontar según el método seleccionado
+            let amountToDiscount;
+            switch(calculationType) {
+                case 'original':
+                    amountToDiscount = originalAmount;
+                    break;
+                case 'futureAtSelected':
+                    amountToDiscount = futureValueAtSelected;
+                    break;
+                case 'future':
+                default:
+                    amountToDiscount = futureValue;
+                    break;
+            }
 
-    res.json({
-      details: calculations,
-      totals,
-      selectedDate,
-      calculationType
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+            // Cálculo del valor descontado
+            const discountedValue = amountToDiscount / Math.pow(1 + (discountRate/100), daysFromSelectedToMaturity/daysInYear);
+            
+            return {
+                documentCode: doc.code,
+                bank: bank.name,
+                currency: doc.currency,
+                originalAmount,
+                futureValue,
+                futureValueAtSelected,
+                discountedValue,
+                amountToDiscount,
+                daysToMaturity,
+                daysToSelected,
+                daysFromSelectedToMaturity,
+                tcea: doc.tcea,
+                discountRate,
+                unit: doc.unit,
+                unitPrice: doc.unitPrice,
+                calculationType
+            };
+        }));
+
+        res.json({
+            details: calculations,
+            selectedDate,
+            calculationType
+        });
+    } catch (error) {
+        console.error('Error en calculatePortfolio:', error);
+        res.status(500).json({ message: error.message });
+    }
 };
 
 exports.deleteDocument = async (req, res) => {

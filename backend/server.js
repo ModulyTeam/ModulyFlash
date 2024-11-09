@@ -36,7 +36,10 @@ app.get('/', (req, res) => {
 
 // Ruta catch-all para SPA
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    // Enviar el index.html para todas las rutas que no sean API
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    }
 });
 
 const PORT = process.env.PORT || 5500;
