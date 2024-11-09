@@ -35,7 +35,9 @@ class PortfolioList {
                     ${this.portfolios.map(portfolio => `
                         <div class="portfolio-card">
                             <div class="portfolio-header">
-                                <h3>Cartera ${portfolio.type}</h3>
+                                <h3>Cartera de ${portfolio.type === 'FACTURA' ? 'Facturas' : 
+                                             portfolio.type === 'LETRA' ? 'Letras' : 
+                                             'Documentos Mixtos'}</h3>
                                 <span class="status-badge ${portfolio.status.toLowerCase()}">
                                     ${portfolio.status}
                                 </span>
@@ -60,6 +62,19 @@ class PortfolioList {
                                 <button onclick="portfolioList.downloadPdf('${portfolio._id}')" class="download-button">
                                     Descargar PDF
                                 </button>
+                                ${(portfolio.status === 'APROBADA' || portfolio.status === 'COMPLETADA') ? `
+                                    <div class="pdf-upload">
+                                        <input type="file" 
+                                            id="pdfUpload_${portfolio._id}" 
+                                            accept=".pdf" 
+                                            style="display: none;"
+                                            onchange="portfolioList.handlePdfUpload('${portfolio._id}', this.files[0])"
+                                        >
+                                        <button onclick="document.getElementById('pdfUpload_${portfolio._id}').click()" class="upload-button">
+                                            Reemplazar PDF
+                                        </button>
+                                    </div>
+                                ` : ''}
                                 <button onclick="portfolioList.deletePortfolio('${portfolio._id}')" class="delete-button">
                                     Eliminar Cartera
                                 </button>
@@ -151,6 +166,33 @@ class PortfolioList {
         } catch (error) {
             console.error('Error:', error);
             alert('Error al eliminar la cartera');
+        }
+    }
+
+    async handlePdfUpload(portfolioId, file) {
+        if (!file) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('pdf', file);
+
+            const response = await fetch(`${API_URL}/portfolios/${portfolioId}/updatePdf`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al actualizar el PDF');
+            }
+
+            alert('PDF actualizado exitosamente');
+            this.loadPortfolios(); // Recargar la lista
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al actualizar el PDF. Por favor, intente nuevamente.');
         }
     }
 }

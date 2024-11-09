@@ -142,4 +142,51 @@ exports.deletePortfolio = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+};
+
+exports.updatePdf = async (req, res) => {
+    try {
+        if (!req.files || !req.files.pdf) {
+            throw new Error('No se proporcionó el archivo PDF');
+        }
+
+        const portfolio = await Portfolio.findOne({
+            _id: req.params.id,
+            userId: req.user.userId
+        });
+
+        if (!portfolio) {
+            return res.status(404).json({ message: 'Cartera no encontrada' });
+        }
+
+        if (!['APROBADA', 'COMPLETADA'].includes(portfolio.status)) {
+            return res.status(400).json({ 
+                message: 'Solo se puede actualizar el PDF de carteras aprobadas o completadas' 
+            });
+        }
+
+        // Eliminar el PDF anterior
+        const oldPdfPath = path.join(__dirname, '..', portfolio.pdfUrl);
+        try {
+            await fs.unlink(oldPdfPath);
+        } catch (error) {
+            console.error('Error al eliminar PDF anterior:', error);
+        }
+
+        // Guardar el nuevo PDF
+        const pdfFile = req.files.pdf;
+        const pdfName = `portfolio_${Date.now()}.pdf`;
+        const pdfPath = path.join(__dirname, '../uploads/portfolios', pdfName);
+        
+        await pdfFile.mv(pdfPath);
+
+        // Actualizar la URL en la base de datos
+        portfolio.pdfUrl = `/uploads/portfolios/${pdfName}`;
+        await portfolio.save();
+
+        res.json({ message: 'PDF actualizado exitosamente' });
+    } catch (error) {
+        console.error('Error al actualizar PDF:', error);
+        res.status(500).json({ message: error.message });
+    }
 }; 

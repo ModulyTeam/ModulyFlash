@@ -81,4 +81,23 @@
 
 .download-button:hover {
     background: #34495e;
+}
+
+.pdf-upload {
+    margin-top: 1rem;
+}
+
+.upload-button {
+    background: #17a2b8;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.upload-button:hover {
+    background: #138496;
 } 

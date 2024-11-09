@@ -11,5 +11,6 @@ router.get('/:id', portfolioController.getPortfolio);
 router.put('/:id/status', portfolioController.updatePortfolioStatus);
 router.get('/:id/download', portfolioController.downloadPdf);
 router.delete('/:id', portfolioController.deletePortfolio);
+router.put('/:id/updatePdf', portfolioController.updatePdf);
 
 module.exports = router; 

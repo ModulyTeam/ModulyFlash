@@ -10,7 +10,7 @@
 endobj
 4 0 obj
 <<
-/Length 2625
+/Length 2627
 >>
 stream
 0.5670000000000001 w
@@ -19,8 +19,8 @@ BT
 /F1 20 Tf
 23. TL
 0 g
-183.737795275590571 785.1970866141732586 Td
-(LETRA DE DESCUENTO) Tj
+177.1377952755905483 785.1970866141732586 Td
+(CARTERA DE FACTURAS) Tj
 ET
 BT
 /F1 14 Tf
@@ -50,18 +50,18 @@ T* () Tj
 T* (            1. OPERACIÓN DE DESCUENTO:) Tj
 T* (               El Cliente cede al Banco BPC el derecho de cobro de 1 documento\(s\)) Tj
 T* (financiero\(s\) ) Tj
-T* (               por un valor nominal total de S/. 1095.45, ) Tj
+T* (               por un valor nominal total de S/. 1102.12, ) Tj
 T* (               que serán cobrados por el banco en sus respectivas fechas de vencimiento.) Tj
 T* () Tj
 T* (            2. PRÉSTAMO A OTORGAR:) Tj
-T* (               El Banco BPC otorgará al Cliente un préstamo por S/. 1095.45) Tj
+T* (               El Banco BPC otorgará al Cliente un préstamo por S/. 1102.12) Tj
 T* (               que representa el valor actual de los documentos calculado a una tasa de) Tj
 T* (descuento del 20% anual.) Tj
 T* (               Este monto será depositado en la cuenta del Cliente en la fecha acordada) Tj
-T* (\(9/11/2024\).) Tj
+T* (\(21/11/2024\).) Tj
 T* () Tj
 T* (            3. INTERESES ADELANTADOS:) Tj
-T* (               El monto de S/. 104.55 representa los intereses que el banco retiene ) Tj
+T* (               El monto de S/. 97.88 representa los intereses que el banco retiene ) Tj
 T* (               por adelantado, calculados desde la fecha de desembolso hasta el vencimiento) Tj
 T* (de cada documento.) Tj
 T* () Tj
@@ -80,11 +80,11 @@ T* (documentos más los gastos ) Tj
 T* (               correspondientes.) Tj
 T* () Tj
 T* (            RESUMEN DE LA OPERACIÓN:) Tj
-T* (            • Valor Nominal Total: S/. 1095.45) Tj
-T* (            • Intereses Adelantados: S/. 104.55) Tj
-T* (            • Monto del Préstamo: S/. 1095.45) Tj
+T* (            • Valor Nominal Total: S/. 1102.12) Tj
+T* (            • Intereses Adelantados: S/. 97.88) Tj
+T* (            • Monto del Préstamo: S/. 1102.12) Tj
 T* (            • Tasa de Descuento Anual: 20%) Tj
-T* (            • Fecha de Desembolso: 9/11/2024) Tj
+T* (            • Fecha de Desembolso: 21/11/2024) Tj
 T* (        ) Tj
 ET
 endstream
@@ -222,7 +222,7 @@ BT
 11.5 TL
 0.314 g
 427.7474061990210998 766.8899999999999864 Td
-(S/. 1095.45) Tj
+(S/. 1102.12) Tj
 ET
 0.78 G
 0. w
@@ -418,7 +418,7 @@ endobj
 21 0 obj
 <<
 /Producer (jsPDF 2.5.1)
-/CreationDate (D:20241109063112-05'00')
+/CreationDate (D:20241109063515-05'00')
 >>
 endobj
 22 0 obj
@@ -432,35 +432,35 @@ endobj
 xref
 0 23
 0000000000 65535 f 
-0000005505 00000 n 
-0000007330 00000 n 
+0000005507 00000 n 
+0000007332 00000 n 
 0000000015 00000 n 
 0000000152 00000 n 
-0000002829 00000 n 
-0000002966 00000 n 
-0000005568 00000 n 
-0000005693 00000 n 
-0000005823 00000 n 
-0000005956 00000 n 
-0000006094 00000 n 
-0000006218 00000 n 
-0000006347 00000 n 
-0000006479 00000 n 
-0000006615 00000 n 
-0000006743 00000 n 
-0000006870 00000 n 
-0000006999 00000 n 
-0000007132 00000 n 
-0000007234 00000 n 
-0000007580 00000 n 
-0000007666 00000 n 
+0000002831 00000 n 
+0000002968 00000 n 
+0000005570 00000 n 
+0000005695 00000 n 
+0000005825 00000 n 
+0000005958 00000 n 
+0000006096 00000 n 
+0000006220 00000 n 
+0000006349 00000 n 
+0000006481 00000 n 
+0000006617 00000 n 
+0000006745 00000 n 
+0000006872 00000 n 
+0000007001 00000 n 
+0000007134 00000 n 
+0000007236 00000 n 
+0000007582 00000 n 
+0000007668 00000 n 
 trailer
 <<
 /Size 23
 /Root 22 0 R
 /Info 21 0 R
-/ID [ <D79BBE5C08D2102CF41F65C6A578F928> <D79BBE5C08D2102CF41F65C6A578F928> ]
+/ID [ <4F2D6A3FFBC55D32847E9F24D5CACB8C> <4F2D6A3FFBC55D32847E9F24D5CACB8C> ]
 >>
 startxref
-7770
+7772
 %%EOF

@@ -85,7 +85,7 @@ class DiscountLetter {
 
     static async savePortfolio(results) {
         try {
-            // Determinar el tipo de cartera
+            // Determinar el tipo de cartera basado en los documentos
             const types = [...new Set(results.details.map(doc => doc.type))];
             const portfolioType = types.length > 1 ? 'MIXTA' : types[0];
 
@@ -95,7 +95,7 @@ class DiscountLetter {
             
             // Configuración inicial
             doc.setFontSize(20);
-            doc.text('LETRA DE DESCUENTO', 105, 20, { align: 'center' });
+            doc.text(`CARTERA DE ${portfolioType === 'FACTURA' ? 'FACTURAS' : portfolioType === 'LETRA' ? 'LETRAS' : 'MIXTA'}`, 105, 20, { align: 'center' });
             
             // Información del banco y fecha
             doc.setFontSize(14);

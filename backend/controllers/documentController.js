@@ -88,6 +88,7 @@ exports.calculatePortfolio = async (req, res) => {
                 documentCode: doc.code,
                 bank: bank.name,
                 currency: doc.currency,
+                type: doc.type,
                 originalAmount,
                 futureValue,
                 futureValueAtSelected,
@@ -106,6 +107,10 @@ exports.calculatePortfolio = async (req, res) => {
                 interesAdelantado
             };
         }));
+
+        // Determinar el tipo de cartera
+        const documentTypes = [...new Set(calculations.map(doc => doc.type))];
+        const portfolioType = documentTypes.length > 1 ? 'MIXTA' : documentTypes[0];
 
         // Calcular totales para la descripción
         const totalDiscounted = calculations.reduce((sum, doc) => sum + doc.discountedValue, 0);
@@ -156,7 +161,8 @@ exports.calculatePortfolio = async (req, res) => {
             details: calculations,
             selectedDate,
             calculationType,
-            paymentDescription
+            paymentDescription,
+            portfolioType
         });
     } catch (error) {
         console.error('Error en calculatePortfolio:', error);
