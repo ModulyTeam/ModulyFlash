@@ -279,7 +279,6 @@ class PortfolioManager {
     async calculatePortfolio() {
         const selectedDate = document.getElementById('selectedDate').value;
         const selectedDocs = Array.from(document.querySelectorAll('input[name="selectedDocs"]:checked'));
-        const bankId = document.getElementById('portfolioBank').value;
         const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked');
         const daysInYear = CalculationConfig.getDaysInYear();
 
@@ -299,9 +298,10 @@ class PortfolioManager {
         }
 
         try {
+            const bankId = document.getElementById('portfolioBank').value;
             const documentData = selectedDocs.map(checkbox => ({
                 documentId: checkbox.value,
-                customDiscountRate: null // Usamos la tasa del banco seleccionado
+                customDiscountRate: null
             }));
 
             const response = await fetch(`${API_URL}/documents/calculate-portfolio`, {
@@ -324,6 +324,7 @@ class PortfolioManager {
             }
 
             const results = await response.json();
+            results.bankId = bankId;
             this.displayResults(results);
         } catch (error) {
             console.error('Error:', error);

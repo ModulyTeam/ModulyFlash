@@ -1,25 +1,23 @@
 const mongoose = require('mongoose');
+const initializeDatabase = require('./init');
 
+// Agregar esta línea para suprimir la advertencia
 mongoose.set('strictQuery', true);
 
 const connectDB = async () => {
-  try {
-    // URI directa para asegurar la conexión
-    const mongoURI = 'mongodb://localhost:27017/sistema-financiero';
-    
-    console.log('Intentando conectar a MongoDB en:', mongoURI);
-
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    console.log('MongoDB conectado exitosamente');
-
-  } catch (error) {
-    console.error('Error detallado conectando a MongoDB:', error);
-    process.exit(1);
-  }
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('MongoDB conectado...');
+        
+        // Inicializar la base de datos
+        await initializeDatabase();
+    } catch (err) {
+        console.error('Error al conectar a MongoDB:', err.message);
+        process.exit(1);
+    }
 };
 
 module.exports = connectDB; 

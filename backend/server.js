@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
@@ -16,18 +17,36 @@ app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['Content-Disposition']
+}));
+
+app.use(fileUpload({
+    createParentPath: true,
+    limits: { 
+        fileSize: 50 * 1024 * 1024 // 50MB max
+    },
+    abortOnLimit: true
 }));
 
 app.use(express.json());
 
-// Servir archivos estáticos del frontend
+// Crear directorio para archivos si no existe
+const uploadsDir = path.join(__dirname, 'uploads', 'portfolios');
+const fs = require('fs');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Servir archivos estáticos
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas API
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/banks', require('./routes/bankRoutes'));
 app.use('/api/documents', require('./routes/documentRoutes'));
+app.use('/api/portfolios', require('./routes/portfolioRoutes'));
 
 // Ruta para el frontend
 app.get('/', (req, res) => {
@@ -36,7 +55,6 @@ app.get('/', (req, res) => {
 
 // Ruta catch-all para SPA
 app.get('*', (req, res) => {
-    // Enviar el index.html para todas las rutas que no sean API
     if (!req.path.startsWith('/api')) {
         res.sendFile(path.join(__dirname, '../frontend/index.html'));
     }

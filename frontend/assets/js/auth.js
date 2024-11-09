@@ -198,9 +198,12 @@ function handleRoute() {
         return;
     }
 
-    // Asegurarnos de que portfolioManager exista
+    // Asegurarnos de que los managers existan
     if (path === '/portfolio' && !window.portfolioManager) {
         window.portfolioManager = new PortfolioManager();
+    }
+    if (path === '/portfolios' && !window.portfolioList) {
+        window.portfolioList = new PortfolioList();
     }
 
     // Manejar rutas
@@ -210,6 +213,13 @@ function handleRoute() {
                 window.portfolioManager.loadPortfolio();
             } else {
                 console.error('No se pudo inicializar portfolioManager');
+            }
+            break;
+        case '/portfolios':
+            if (window.portfolioList) {
+                window.portfolioList.loadPortfolios();
+            } else {
+                console.error('No se pudo inicializar portfolioList');
             }
             break;
         case '/documents':
