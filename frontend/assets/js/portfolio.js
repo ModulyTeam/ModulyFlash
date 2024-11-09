@@ -43,6 +43,10 @@ class PortfolioManager {
                 <div class="portfolio-section">
                     <h2>Cartera de Descuento</h2>
                     
+                    <button class="tutorial-button" onclick="PortfolioTutorial.startTutorial()">
+                        ¿Cómo funciona?
+                    </button>
+
                     <div class="portfolio-config">
                         <div class="validation-steps">
                             <h3>Configuración Inicial de la Cartera</h3>
@@ -189,6 +193,9 @@ class PortfolioManager {
         documentSection.innerHTML = `
             <div class="selected-config-summary">
                 <h3>Documentos Disponibles</h3>
+                <button class="tutorial-button" onclick="PortfolioTutorial.startTutorial()">
+                    ¿Cómo funciona?
+                </button>
                 <p>Banco seleccionado: ${selectedBank.name} (Tasa: ${selectedBank.discountRate}%)</p>
             </div>
 
@@ -326,12 +333,9 @@ class PortfolioManager {
 
     displayResults(results) {
         const resultsContainer = document.getElementById('calculationResults');
-        if (!resultsContainer) {
-            console.error('No se encontró el contenedor de resultados');
-            return;
-        }
+        if (!resultsContainer) return;
 
-        // Separar documentos por moneda
+        const daysInYear = CalculationConfig.getDaysInYear();
         const penDocs = results.details.filter(doc => doc.currency === 'PEN');
         const usdDocs = results.details.filter(doc => doc.currency === 'USD');
 
@@ -340,12 +344,6 @@ class PortfolioManager {
                 <h3>Resultados del Cálculo</h3>
                 <p class="calculation-date">Fecha de descuento: ${new Date(results.selectedDate).toLocaleDateString()}</p>
                 
-                <!-- Resumen de la configuración -->
-                <div class="calculation-config">
-                    <p><strong>Método de cálculo:</strong> ${CalculationMethods.getMethodDescription(results.calculationType)}</p>
-                    <p><strong>Configuración de días:</strong> ${CalculationConfig.getConfigDescription()}</p>
-                </div>
-
                 <!-- Tablas de resultados por moneda -->
                 ${penDocs.length > 0 ? PortfolioCalculations.renderCurrencyResults('PEN', penDocs, 
                     PortfolioCalculations.calculateTotals(penDocs)) : ''}
@@ -353,34 +351,55 @@ class PortfolioManager {
                 ${usdDocs.length > 0 ? PortfolioCalculations.renderCurrencyResults('USD', usdDocs, 
                     PortfolioCalculations.calculateTotals(usdDocs)) : ''}
 
-                <!-- Detalles del cálculo -->
-                <div class="calculation-details">
-                    <h4>Detalle de Cálculos</h4>
-                    ${results.details.map(doc => `
-                        <div class="calculation-item">
-                            <h5>Documento: ${doc.documentCode}</h5>
-                            <div class="calculation-steps">
-                                <div class="step">
-                                    <h6>1. Datos del documento</h6>
-                                    <p>• Monto Original: ${doc.currency === 'PEN' ? 'S/. ' : '$ '}${doc.originalAmount.toFixed(2)}</p>
-                                    <p>• TCEA: ${doc.tcea}%</p>
-                                    <p>• Tasa de Descuento: ${doc.discountRate}%</p>
-                                </div>
-                                <div class="step">
-                                    <h6>2. Plazos</h6>
-                                    <p>• Días hasta vencimiento: ${doc.daysToMaturity}</p>
-                                    <p>• Días desde emisión hasta fecha seleccionada: ${doc.daysToSelected}</p>
-                                    <p>• Días restantes desde fecha seleccionada: ${doc.daysFromSelectedToMaturity}</p>
-                                </div>
-                                <div class="step">
-                                    <h6>3. Resultados</h6>
-                                    <p>• Monto Original: ${doc.currency === 'PEN' ? 'S/. ' : '$ '}${doc.originalAmount.toFixed(2)}</p>
-                                    <p>• Interés Acumulado: ${doc.currency === 'PEN' ? 'S/. ' : '$ '}${(doc.futureValue - doc.originalAmount).toFixed(2)}</p>
-                                    <p>• Valor Descontado: ${doc.currency === 'PEN' ? 'S/. ' : '$ '}${doc.discountedValue.toFixed(2)}</p>
+                <!-- Detalle de cálculos aplicados -->
+                <div class="calculations-detail">
+                    <h4>Detalle de Cálculos Aplicados</h4>
+                    ${results.details.map(detail => {
+                        const currencySymbol = detail.currency === 'PEN' ? 'S/. ' : '$ ';
+                        const tceaDecimal = detail.tcea / 100;
+                        const discountRateDecimal = detail.discountRate / 100;
+                        
+                        // Calcular los valores intermedios
+                        const tceaPower = Math.pow(1 + tceaDecimal, detail.daysToMaturity/daysInYear);
+                        const discountPower = Math.pow(1 + discountRateDecimal, detail.daysFromSelectedToMaturity/daysInYear);
+                        
+                        return `
+                            <div class="calculation-item">
+                                <h5>Documento: ${detail.documentCode}</h5>
+                                <div class="calculation-steps">
+                                    <div class="step">
+                                        <h6>1. Cálculo del Monto Original:</h6>
+                                        <p class="formula">Monto = Unidades × Precio Unitario</p>
+                                        <p class="formula">${detail.unit} × ${currencySymbol}${detail.unitPrice} = ${currencySymbol}${detail.originalAmount.toFixed(2)}</p>
+                                    </div>
+                                    
+                                    <div class="step">
+                                        <h6>2. Cálculo del Valor Futuro al Vencimiento:</h6>
+                                        <p class="formula">VF = Monto × (1 + TCEA)^(días/360)</p>
+                                        <p class="formula">${currencySymbol}${detail.originalAmount.toFixed(2)} × (1 + ${detail.tcea}%)^(${detail.daysToMaturity}/${daysInYear})</p>
+                                        <p class="formula">${currencySymbol}${detail.originalAmount.toFixed(2)} × ${tceaPower.toFixed(6)}</p>
+                                        <p class="result">= ${currencySymbol}${detail.futureValue.toFixed(2)}</p>
+                                    </div>
+
+                                    <div class="step">
+                                        <h6>3. Cálculo del Valor Descontado:</h6>
+                                        <p class="formula">VD = Monto Base ÷ (1 + Tasa)^(días/360)</p>
+                                        <p class="formula">${currencySymbol}${detail.amountToDiscount.toFixed(2)} ÷ (1 + ${detail.discountRate}%)^(${detail.daysFromSelectedToMaturity}/${daysInYear})</p>
+                                        <p class="formula">${currencySymbol}${detail.amountToDiscount.toFixed(2)} ÷ ${discountPower.toFixed(6)}</p>
+                                        <p class="result">= ${currencySymbol}${detail.discountedValue.toFixed(2)}</p>
+                                    </div>
+
+                                    <div class="summary">
+                                        <p><strong>Días hasta el vencimiento:</strong> ${detail.daysToMaturity}</p>
+                                        <p><strong>Días desde emisión hasta fecha seleccionada:</strong> ${detail.daysToSelected}</p>
+                                        <p><strong>Días desde fecha seleccionada hasta vencimiento:</strong> ${detail.daysFromSelectedToMaturity}</p>
+                                        <p><strong>Tasa TCEA:</strong> ${detail.tcea}%</p>
+                                        <p><strong>Tasa de Descuento:</strong> ${detail.discountRate}%</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
 
                 <!-- Botón para exportar a PDF -->

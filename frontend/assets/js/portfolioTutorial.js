@@ -10,11 +10,32 @@ class PortfolioTutorial {
                            cuando necesitas financiamiento antes de su fecha de vencimiento.`
                 },
                 {
-                    element: '.portfolio-section',
-                    title: 'Caso de Estudio',
-                    intro: `Imagina que tienes facturas o letras por cobrar, pero necesitas el dinero antes 
-                           del vencimiento. Esta calculadora te ayuda a determinar cuánto dinero podrías 
-                           recibir hoy de un banco por estos documentos.`
+                    element: '.portfolio-config',
+                    title: 'Configuración Inicial',
+                    intro: `Primero debes configurar los parámetros básicos de tu cartera:`
+                },
+                {
+                    element: '.validation-item:nth-child(1)',
+                    title: 'Moneda de la Cartera',
+                    intro: `Selecciona la moneda en la que deseas trabajar. Una cartera solo puede contener 
+                           documentos de una misma moneda.`
+                },
+                {
+                    element: '.validation-item:nth-child(2)',
+                    title: 'Banco para Descuento',
+                    intro: `Elige el banco que financiará tu cartera. Solo se mostrarán bancos que 
+                           acepten la moneda seleccionada.`
+                },
+                {
+                    element: '.validation-item:nth-child(3)',
+                    title: 'Tipo de Documentos',
+                    intro: `Define qué tipo de documentos incluirás en la cartera.`
+                },
+                {
+                    element: '.continue-button',
+                    title: 'Continuar',
+                    intro: `Una vez configurada la cartera, haz clic aquí para ver los documentos disponibles 
+                           según tus criterios.`
                 },
                 {
                     element: '.date-selection',
@@ -23,42 +44,17 @@ class PortfolioTutorial {
                            a la emisión del documento y anterior a su vencimiento.`
                 },
                 {
-                    element: '.days-config-section',
-                    title: 'Configuración del Año',
-                    intro: `Puedes elegir entre año comercial (360 días) o calendario (365 días) para los cálculos. 
-                           Los bancos suelen usar el año comercial de 360 días.`
-                },
-                {
                     element: '.documents-selection',
                     title: 'Selección de Documentos',
-                    intro: `Aquí verás todos tus documentos financieros. Selecciona los que deseas descontar. 
-                           Si un documento no tiene banco asignado, deberás ingresar una tasa de descuento manualmente.`
+                    intro: `Aquí verás todos los documentos que cumplen con los criterios seleccionados.`
                 },
                 {
                     element: '.calculation-method-section',
-                    title: 'Métodos de Cálculo',
-                    intro: `<b>Valor Futuro al Vencimiento:</b> Calcula primero el valor futuro total y luego lo descuenta.<br><br>
-                           <b>Monto Original:</b> Descuenta directamente el monto original.<br><br>
-                           <b>Valor Futuro a Fecha:</b> Calcula el valor futuro hasta la fecha seleccionada y luego descuenta.`
-                },
-                {
-                    element: '.calculate-button',
-                    title: 'Calcular Descuento',
-                    intro: 'Al calcular, verás los resultados separados por moneda y banco.'
-                },
-                {
-                    element: '.results-container',
-                    title: 'Resultados',
-                    intro: `Los resultados muestran:<br>
-                           - Tablas separadas por moneda<br>
-                           - Valor original, futuro y descontado<br>
-                           - Detalles del cálculo paso a paso<br>
-                           - Recomendaciones de bancos si hay documentos sin banco asignado`
-                },
-                {
-                    element: '.export-button',
-                    title: 'Exportar Resultados',
-                    intro: 'Puedes exportar todos los cálculos y resultados a un PDF detallado.'
+                    title: 'Método de Cálculo',
+                    intro: `Elige cómo quieres calcular el descuento:<br><br>
+                           <b>• Valor Futuro al Vencimiento:</b> Usa el valor final del documento<br>
+                           <b>• Monto Original:</b> Usa el valor inicial del documento<br>
+                           <b>• Valor Futuro a Fecha:</b> Usa el valor del documento a la fecha seleccionada`
                 }
             ],
             showProgress: true,
