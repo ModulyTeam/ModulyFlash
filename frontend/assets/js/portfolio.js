@@ -402,13 +402,9 @@ class PortfolioManager {
                     }).join('')}
                 </div>
 
-                <!-- Botón para exportar a PDF -->
-                <button onclick="PDFGenerator.generatePortfolioPDF(${JSON.stringify(results)}, 
-                    '${results.selectedDate}', 
-                    '${CalculationMethods.getMethodDescription(results.calculationType)}',
-                    '${CalculationConfig.getConfigDescription()}')" 
-                    class="export-button">
-                    Exportar a PDF
+                <!-- Solo el botón de generar letra de descuento -->
+                <button type="button" class="generate-letter-button" id="generateLetterBtn">
+                    Generar Letra de Descuento
                 </button>
             </div>
         `;
@@ -416,6 +412,23 @@ class PortfolioManager {
         resultsContainer.innerHTML = resultsHTML;
         resultsContainer.style.display = 'block';
         resultsContainer.scrollIntoView({ behavior: 'smooth' });
+
+        // Agregar el event listener después de crear el botón
+        document.getElementById('generateLetterBtn').addEventListener('click', () => {
+            if (typeof DiscountLetter === 'undefined') {
+                console.error('DiscountLetter no está definido. Asegúrese de que discountLetter.js está cargado.');
+                alert('Error al cargar el componente de letra de descuento. Por favor, recargue la página.');
+                return;
+            }
+            
+            try {
+                window.tempPortfolioResults = results;
+                DiscountLetter.generatePreview(results);
+            } catch (error) {
+                console.error('Error al generar la letra de descuento:', error);
+                alert('Error al generar la letra de descuento. Por favor, intente nuevamente.');
+            }
+        });
     }
 }
 

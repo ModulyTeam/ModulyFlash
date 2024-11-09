@@ -81,6 +81,9 @@ exports.calculatePortfolio = async (req, res) => {
             // Cálculo del valor descontado
             const discountedValue = amountToDiscount / Math.pow(1 + (discountRate/100), daysFromSelectedToMaturity/daysInYear);
             
+            // Cálculo del interés adelantado
+            const interesAdelantado = amountToDiscount - discountedValue;
+            
             return {
                 documentCode: doc.code,
                 bank: bank.name,
@@ -97,14 +100,63 @@ exports.calculatePortfolio = async (req, res) => {
                 discountRate,
                 unit: doc.unit,
                 unitPrice: doc.unitPrice,
-                calculationType
+                calculationType,
+                emissionDate: doc.emissionDate,
+                dueDate: doc.dueDate,
+                interesAdelantado
             };
         }));
+
+        // Calcular totales para la descripción
+        const totalDiscounted = calculations.reduce((sum, doc) => sum + doc.discountedValue, 0);
+        const totalInteresAdelantado = calculations.reduce((sum, doc) => sum + doc.interesAdelantado, 0);
+        const currency = calculations[0].currency;
+        const currencySymbol = currency === 'PEN' ? 'S/. ' : '$ ';
+
+        // Generar descripción del pago
+        const paymentDescription = `
+            ACUERDO DE DESCUENTO DE CARTERA
+
+            Por medio del presente documento, se establece el siguiente acuerdo de descuento entre el Cliente y ${bank.name}:
+
+            1. OPERACIÓN DE DESCUENTO:
+               El Cliente cede al Banco ${bank.name} el derecho de cobro de ${calculations.length} documento(s) financiero(s) 
+               por un valor nominal total de ${currencySymbol}${totalDiscounted.toFixed(2)}, 
+               que serán cobrados por el banco en sus respectivas fechas de vencimiento.
+
+            2. PRÉSTAMO A OTORGAR:
+               El Banco ${bank.name} otorgará al Cliente un préstamo por ${currencySymbol}${totalDiscounted.toFixed(2)}
+               que representa el valor actual de los documentos calculado a una tasa de descuento del ${bank.discountRate}% anual.
+               Este monto será depositado en la cuenta del Cliente en la fecha acordada (${new Date(selectedDate).toLocaleDateString()}).
+
+            3. INTERESES ADELANTADOS:
+               El monto de ${currencySymbol}${totalInteresAdelantado.toFixed(2)} representa los intereses que el banco retiene 
+               por adelantado, calculados desde la fecha de desembolso hasta el vencimiento de cada documento.
+
+            4. DOCUMENTOS INCLUIDOS:
+               La presente cartera incluye documentos con vencimientos entre 
+               ${new Date(Math.min(...calculations.map(doc => new Date(doc.dueDate)))).toLocaleDateString()}
+               y ${new Date(Math.max(...calculations.map(doc => new Date(doc.dueDate)))).toLocaleDateString()}.
+
+            5. COMPROMISO DE PAGO:
+               El Cliente confirma que los documentos son legítimos y que sus deudores realizarán el pago 
+               en las fechas de vencimiento establecidas. En caso de incumplimiento por parte de los deudores, 
+               el Cliente se compromete a reembolsar al banco el valor nominal de los documentos más los gastos 
+               correspondientes.
+
+            RESUMEN DE LA OPERACIÓN:
+            • Valor Nominal Total: ${currencySymbol}${totalDiscounted.toFixed(2)}
+            • Intereses Adelantados: ${currencySymbol}${totalInteresAdelantado.toFixed(2)}
+            • Monto del Préstamo: ${currencySymbol}${totalDiscounted.toFixed(2)}
+            • Tasa de Descuento Anual: ${bank.discountRate}%
+            • Fecha de Desembolso: ${new Date(selectedDate).toLocaleDateString()}
+        `;
 
         res.json({
             details: calculations,
             selectedDate,
-            calculationType
+            calculationType,
+            paymentDescription
         });
     } catch (error) {
         console.error('Error en calculatePortfolio:', error);

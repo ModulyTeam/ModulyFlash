@@ -1,0 +1,117 @@
+.discount-letter-preview {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.letter-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.bank-info {
+    margin: 1rem 0;
+}
+
+.letter-details {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.documents-summary {
+    margin: 2rem 0;
+}
+
+.documents-summary table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.documents-summary th,
+.documents-summary td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.documents-summary th {
+    background: #f8f9fa;
+}
+
+.letter-footer {
+    margin-top: 3rem;
+}
+
+.signatures {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 4rem;
+}
+
+.signature-line {
+    text-align: center;
+}
+
+.signature-line p:first-child {
+    border-top: 1px solid #000;
+    width: 200px;
+    margin: 0 auto;
+    padding-top: 0.5rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.back-button,
+.create-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.back-button {
+    background: #6c757d;
+    color: white;
+}
+
+.create-button {
+    background: var(--primary-color);
+    color: white;
+}
+
+.back-button:hover {
+    background: #5a6268;
+}
+
+.create-button:hover {
+    background: #34495e;
+}
+
+.payment-description {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.payment-description pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+    line-height: 1.5;
+    color: #333;
+} 

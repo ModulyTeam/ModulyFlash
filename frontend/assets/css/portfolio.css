@@ -239,4 +239,23 @@
 
 .export-button:hover {
     background: #34495e;
+}
+
+.generate-letter-button {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+    padding: 1rem 2rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1.1rem;
+}
+
+.generate-letter-button:hover {
+    background: #34495e;
 } 
