@@ -193,9 +193,6 @@ class PortfolioManager {
         documentSection.innerHTML = `
             <div class="selected-config-summary">
                 <h3>Documentos Disponibles</h3>
-                <button class="tutorial-button" onclick="PortfolioTutorial.startTutorial()">
-                    ¿Cómo funciona?
-                </button>
                 <p>Banco seleccionado: ${selectedBank.name} (Tasa: ${selectedBank.discountRate}%)</p>
             </div>
 

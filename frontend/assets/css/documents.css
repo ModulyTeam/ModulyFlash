@@ -43,10 +43,6 @@
     box-shadow: 0 0 5px rgba(26, 115, 232, 0.2);
 }
 
-.table-container {
-    overflow-x: auto;
-}
-
 .table-container table {
     width: 100%;
     border-collapse: collapse;

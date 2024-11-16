@@ -32,7 +32,7 @@
 }
 
 .days-option:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--quaternary-color);
 }
 
 .days-option input[type="radio"] {

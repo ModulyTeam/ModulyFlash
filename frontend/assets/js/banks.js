@@ -55,7 +55,7 @@ class BankManager {
                                     <td>${this.formatAcceptedCurrencies(bank.acceptedCurrencies)}</td>
                                     <td>${bank.accountNumber}</td>
                                     <td>
-                                        <button onclick="bankManager.editBank('${bank._id}')">Editar</button>
+                                        <button onclick="bankManager.editBank('${bank._id}')" class="editButton">Editar</button>
                                         <button onclick="bankManager.deleteBank('${bank._id}')">Eliminar</button>
                                     </td>
                                 </tr>
