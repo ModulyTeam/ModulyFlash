@@ -1,0 +1,76 @@
+.currency-results {
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 1200px;
+}
+
+.currency-results h4 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.results-summary {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--accent-color);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.results-summary p {
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.results-summary strong {
+    color: var(--primary-color);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 1rem;
+    text-align: left;
+}
+
+thead {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+thead th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: normal;
+}
+
+tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody td {
+    padding: 0.75rem;
+}
+
+.totals-row td {
+    background-color: var(--accent-color);
+    font-weight: bold;
+}
+
+.totals-row td:first-child {
+    text-align: right;
+}

@@ -16,8 +16,8 @@ async function showWelcome() {
                 <p>Utiliza la barra de navegación para acceder a las diferentes funcionalidades.</p>
                 
                 <div class="user-profile-section">
-                    <h3>Tu Perfil</h3>
                     <form id="profileForm">
+                        <h3>Tu Perfil</h3>
                         <div class="form-group">
                             <label>Nombre de Usuario</label>
                             <input type="text" id="username" value="${userData.username}" required>

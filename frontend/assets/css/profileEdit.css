@@ -1,0 +1,79 @@
+.welcome-section {
+    max-width: 80vw;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.welcome-section p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+}
+
+.welcome-section>div {
+    flex: 1;
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.user-profile-section {
+    display: flex;
+    justify-content: center;
+}
+
+.user-profile-section h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.user-profile-section h4 {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.user-profile-section>form {
+    margin-right: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.user-profile-section>form button {
+    margin-top: 1rem;
+    align-self: center;
+}
+
+.user-profile-section>form label {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: lightslategray;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.user-profile-section>form input {
+    margin-bottom: 0.5rem;
+}
+
+@media only screen and (max-width: 600px) {
+    .user-profile-section{
+        flex-direction: column;
+    }
+
+    .user-profile-section>form {
+        display: flex;
+        gap: 0.2rem;
+        align-items: flex-start;
+    }
+
+    .user-profile-section>form button {
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+}

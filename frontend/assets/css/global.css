@@ -1,0 +1,85 @@
+:root {
+    --primary-color: #18478c;
+    --secondary-color: #1a73e8;
+    --tertiary-color: #1764b7;
+    --accent-color: #edf5ff;
+    --background-color: #ecf0f1;
+    --text-color: #2c3e50;
+    --error-color: #e74c3c;
+    --success-color: #27ae60;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.section {
+    background-color: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+div>h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+button {
+    padding: 0.75rem;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--tertiary-color);
+}
+
+input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccd1d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    border-color: #18478c;
+    outline: none;
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.2);
+}
+
+div>form>input,
+div>form>select,
+div>form>textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+div>form> input:focus,
+div>form> select:focus,
+div>form> textarea:focus{
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.2);
+}
