@@ -195,7 +195,7 @@ class PortfolioList {
                 }
             });
             const portfolio = await response.json();
-            
+
             const modal = document.createElement('div');
             modal.className = 'portfolio-modal';
             modal.innerHTML = `
@@ -234,6 +234,14 @@ class PortfolioList {
                                             <span class="detail-value">${portfolio.currency === 'PEN' ? 'S/. ' : '$ '}${doc.discountedAmount.toFixed(2)}</span>
                                         </div>
                                     </div>
+                                    <div class="document-actions">
+                                        <button class="view-details-button" onclick="portfolioList.viewDocumentDetails('${doc.documentId._id}', ${portfolio.currency === 'PEN' ? true : false}, ${doc.discountedAmount})">
+                                            Ver Detalles Completos
+                                        </button>
+                                        <button class="generate-pdf-button" onclick="portfolioList.generateDocumentPDF('${doc.documentId._id}', ${portfolio.currency === 'PEN' ? true : false}, ${doc.discountedAmount})">
+                                            Generar PDF
+                                        </button>
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -245,6 +253,106 @@ class PortfolioList {
         } catch (error) {
             console.error('Error:', error);
             alert('Error al cargar los detalles de la cartera');
+        }
+    }
+
+    async viewDocumentDetails(documentId, isPEN, discountedAmount) {
+        try {
+            // Verificar que documentId sea válido
+            if (!documentId) {
+                throw new Error('ID de documento no válido');
+            }
+
+            const response = await fetch(`${API_URL}/documents/${documentId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al obtener el documento');
+            }
+
+            const docData = await response.json();
+
+            const detailsModal = document.createElement('div');
+            detailsModal.className = 'portfolio-modal';
+            detailsModal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Detalles del Documento</h3>
+                    <div class="document-full-details">
+                        <p><strong>Código:</strong> ${docData.code}</p>
+                        <p><strong>Tipo:</strong> ${docData.type}</p>
+                        <p><strong>Descripción:</strong> ${docData.description || '-'}</p>
+                        <p><strong>Fecha de Emisión:</strong> ${new Date(docData.emissionDate).toLocaleDateString()}</p>
+                        <p><strong>Fecha de Vencimiento:</strong> ${new Date(docData.dueDate).toLocaleDateString()}</p>
+                        <p><strong>Moneda:</strong> ${docData.currency}</p>
+                        <p><strong>TCEA:</strong> ${docData.tcea}%</p>
+                        <p><strong>Cantidad:</strong> ${docData.unit}</p>
+                        <p><strong>Precio Unitario:</strong> ${isPEN ? 'S/. ' : '$ '}${docData.unitPrice}</p>
+                        <p><strong>Monto Original:</strong> ${isPEN ? 'S/. ' : '$ '}${(docData.unit * docData.unitPrice).toFixed(2)}</p>
+                        <p><strong>Monto Descontado:</strong> ${isPEN ? 'S/. ' : '$ '}${discountedAmount.toFixed(2)}</p>
+                        <p><strong>Estado:</strong> ${docData.status}</p>
+                    </div>
+                    <button class="close-button" onclick="this.closest('.portfolio-modal').remove()">Cerrar</button>
+                </div>
+            `;
+            document.body.appendChild(detailsModal);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al cargar los detalles del documento');
+        }
+    }
+
+    async generateDocumentPDF(documentId, isPEN, discountedAmount) {
+        try {
+            const response = await fetch(`${API_URL}/documents/${documentId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const document = await response.json();
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(16);
+            doc.text('Detalles del Documento', 20, 20);
+
+            const data = [
+                ['Campo', 'Valor'],
+                ['Código', document.code],
+                ['Tipo', document.type],
+                ['Descripción', document.description || '-'],
+                ['Fecha de Emisión', new Date(document.emissionDate).toLocaleDateString()],
+                ['Fecha de Vencimiento', new Date(document.dueDate).toLocaleDateString()],
+                ['Moneda', document.currency],
+                ['TCEA', `${document.tcea}%`],
+                ['Cantidad', document.unit.toString()],
+                ['Precio Unitario', `${isPEN ? 'S/. ' : '$ '}${document.unitPrice}`],
+                ['Monto Original', `${isPEN ? 'S/. ' : '$ '}${(document.unit * document.unitPrice).toFixed(2)}`],
+                ['Monto Descontado', `${isPEN ? 'S/. ' : '$ '}${discountedAmount.toFixed(2)}`],
+                ['Estado', document.status]
+            ];
+
+            doc.autoTable({
+                startY: 30,
+                head: [data[0]],
+                body: data.slice(1),
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 5
+                },
+                headStyles: {
+                    fillColor: [24, 71, 140]
+                }
+            });
+
+            doc.save(`documento_${document.code}.pdf`);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al generar el PDF');
         }
     }
 
@@ -309,9 +417,10 @@ const styles = `
 
     .document-item {
         background: var(--accent-color);
-        padding: 1rem;
+        padding: 1.5rem;
         border-radius: 8px;
         border: 1px solid var(--primary-color);
+        margin-bottom: 1rem;
     }
 
     .close-button {
@@ -322,6 +431,53 @@ const styles = `
         border-radius: 4px;
         cursor: pointer;
         margin-top: 1rem;
+    }
+
+    .summary-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .summary-info p {
+        padding: 0.6rem;
+        background: var(--accent-color);
+        border-radius: 6px;
+        margin: 0;
+    }
+
+    .document-item {
+        background: var(--accent-color);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .document-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        justify-content: flex-end;
+    }
+
+    .view-details-button {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .generate-pdf-button {
+        background-color: var(--success-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
     }
 `;
 

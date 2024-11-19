@@ -56,14 +56,10 @@ exports.calculatePortfolio = async (req, res) => {
             const daysToSelected = Math.floor((new Date(selectedDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
             const daysFromSelectedToMaturity = Math.floor((new Date(doc.dueDate) - new Date(selectedDate)) / (1000 * 60 * 60 * 24));
 
-            // Usar la tasa de descuento del banco seleccionado
             const discountRate = bank.discountRate;
-
-            // Cálculo del valor futuro usando TCEA
             const futureValue = originalAmount * Math.pow(1 + (doc.tcea/100), daysToMaturity/daysInYear);
             const futureValueAtSelected = originalAmount * Math.pow(1 + (doc.tcea/100), daysToSelected/daysInYear);
             
-            // Determinar el monto a descontar según el método seleccionado
             let amountToDiscount;
             switch(calculationType) {
                 case 'original':
@@ -78,13 +74,11 @@ exports.calculatePortfolio = async (req, res) => {
                     break;
             }
 
-            // Cálculo del valor descontado
             const discountedValue = amountToDiscount / Math.pow(1 + (discountRate/100), daysFromSelectedToMaturity/daysInYear);
-            
-            // Cálculo del interés adelantado
             const interesAdelantado = amountToDiscount - discountedValue;
             
             return {
+                documentId: doc._id,
                 documentCode: doc.code,
                 bank: bank.name,
                 currency: doc.currency,
@@ -162,7 +156,8 @@ exports.calculatePortfolio = async (req, res) => {
             selectedDate,
             calculationType,
             paymentDescription,
-            portfolioType
+            portfolioType,
+            bankId
         });
     } catch (error) {
         console.error('Error en calculatePortfolio:', error);
@@ -185,4 +180,21 @@ exports.deleteDocument = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+exports.getDocument = async (req, res) => {
+    try {
+        const document = await Document.findOne({
+            _id: req.params.id,
+            userId: req.user.userId
+        }).populate('bankId', 'name');
+
+        if (!document) {
+            return res.status(404).json({ message: 'Documento no encontrado' });
+        }
+
+        res.json(document);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }; 

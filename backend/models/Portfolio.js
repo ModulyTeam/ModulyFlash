@@ -45,7 +45,8 @@ const portfolioSchema = new mongoose.Schema({
     documents: [{
         documentId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Document'
+            ref: 'Document',
+            required: true
         },
         originalAmount: Number,
         discountedAmount: Number
@@ -53,20 +54,7 @@ const portfolioSchema = new mongoose.Schema({
     pdfUrl: {
         type: String,
         required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
-});
-
-portfolioSchema.pre('save', function(next) {
-    this.updatedAt = Date.now();
-    next();
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Portfolio', portfolioSchema); 

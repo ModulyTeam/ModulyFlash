@@ -85,6 +85,8 @@ class DiscountLetter {
 
     static async savePortfolio(results) {
         try {
+            console.log('Resultados:', results); // Para debug
+
             // Determinar el tipo de cartera basado en los documentos
             const types = [...new Set(results.details.map(doc => doc.type))];
             const portfolioType = types.length > 1 ? 'MIXTA' : types[0];
@@ -145,11 +147,17 @@ class DiscountLetter {
             formData.append('discountedAmount', results.details.reduce((sum, doc) => sum + doc.discountedValue, 0));
             formData.append('interestAmount', results.details.reduce((sum, doc) => sum + (doc.amountToDiscount - doc.discountedValue), 0));
             formData.append('discountDate', results.selectedDate);
-            formData.append('documents', JSON.stringify(results.details.map(doc => ({
-                documentId: doc.documentId,
+
+            // Modificar la estructura de los documentos para incluir documentId
+            const documentsData = results.details.map(doc => ({
+                documentId: doc.documentId,  // Ahora este campo existe en los resultados
                 originalAmount: doc.originalAmount,
                 discountedAmount: doc.discountedValue
-            }))));
+            }));
+
+            console.log('Documentos a enviar:', documentsData); // Para debug
+
+            formData.append('documents', JSON.stringify(documentsData));
 
             // Guardar en la base de datos
             const response = await fetch(`${API_URL}/portfolios`, {
@@ -169,7 +177,7 @@ class DiscountLetter {
             alert('Cartera guardada exitosamente');
 
             // Redirigir a la vista de carteras
-            window.location.href = '/portfolios';
+            window.location.href = '#portfolios';
         } catch (error) {
             console.error('Error:', error);
             alert(error.message || 'Error al guardar la cartera. Por favor, intente nuevamente.');

@@ -19,12 +19,21 @@ exports.createPortfolio = async (req, res) => {
             documents
         } = req.body;
 
+        console.log('Documentos recibidos:', documents); // Para debug
+
         // Guardar el PDF
         const pdfFile = req.files.pdf;
         const pdfName = `portfolio_${Date.now()}.pdf`;
         const pdfPath = path.join(__dirname, '../uploads/portfolios', pdfName);
         
         await pdfFile.mv(pdfPath);
+
+        // Parsear los documentos y validar que cada uno tenga su documentId
+        const parsedDocuments = JSON.parse(documents);
+        
+        if (!parsedDocuments.every(doc => doc.documentId)) {
+            throw new Error('Todos los documentos deben tener un documentId');
+        }
 
         const portfolio = new Portfolio({
             userId: req.user.userId,
@@ -35,7 +44,7 @@ exports.createPortfolio = async (req, res) => {
             discountedAmount: parseFloat(discountedAmount),
             interestAmount: parseFloat(interestAmount),
             discountDate,
-            documents: JSON.parse(documents),
+            documents: parsedDocuments,
             pdfUrl: `/uploads/portfolios/${pdfName}`,
             status: 'PENDIENTE'
         });
@@ -68,6 +77,7 @@ exports.getPortfolio = async (req, res) => {
             userId: req.user.userId
         })
         .populate('bankId', 'name')
+        .populate('documents.documentId', 'code type emissionDate dueDate currency tcea unit unitPrice status description')
         .select('-userId -__v');
 
         if (!portfolio) {
