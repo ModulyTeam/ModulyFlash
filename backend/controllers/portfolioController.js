@@ -68,7 +68,7 @@ exports.getPortfolio = async (req, res) => {
             userId: req.user.userId
         })
         .populate('bankId', 'name')
-        .populate('documents.documentId', 'code type');
+        .select('-userId -__v');
 
         if (!portfolio) {
             return res.status(404).json({ message: 'Cartera no encontrada' });

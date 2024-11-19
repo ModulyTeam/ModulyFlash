@@ -20,12 +20,12 @@ class HomeManager {
     renderHome(userData) {
         const content = document.getElementById('content');
         content.innerHTML = `
-            <div class="home-section" data-intro="¡Bienvenido a tu panel principal!" data-step="1">
+            <div class="welcome-section">
                 <h2>Bienvenido, ${userData.username}</h2>
                 
-                <div class="profile-section" data-intro="Aquí puedes gestionar tu perfil" data-step="2">
-                    <h3>Tu Perfil</h3>
+                <div class="user-profile-section">
                     <form id="profileForm">
+                        <h3>Tu Perfil</h3>
                         <div class="form-group">
                             <label>Nombre de Usuario</label>
                             <input type="text" id="username" value="${userData.username}" required>
@@ -33,7 +33,7 @@ class HomeManager {
                         <button type="submit">Actualizar Usuario</button>
                     </form>
 
-                    <form id="passwordForm" class="mt-4">
+                    <form id="passwordForm">
                         <h4>Cambiar Contraseña</h4>
                         <div class="form-group">
                             <label>Contraseña Actual</label>
@@ -49,9 +49,7 @@ class HomeManager {
                         </div>
                         <button type="submit">Cambiar Contraseña</button>
                     </form>
-                </div>               
-
- 
+                </div>
             </div>
         `;
 
