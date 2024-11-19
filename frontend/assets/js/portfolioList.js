@@ -22,8 +22,8 @@ class PortfolioList {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            const portfolios = await response.json();
-            this.renderPortfolios(portfolios);
+            this.portfolios = await response.json();
+            this.renderPortfolios(this.portfolios);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -31,9 +31,53 @@ class PortfolioList {
 
     renderPortfolios(portfolios) {
         const content = document.getElementById('content');
+        
+        // Obtener opciones únicas para los datalists
+        const uniqueBanks = [...new Set(portfolios.map(p => p.bankId.name))];
+        const uniqueAmounts = [...new Set(portfolios.map(p => p.discountedAmount.toFixed(2)))];
+
         content.innerHTML = `
             <div class="portfolios-section">
                 <h2>Carteras de Descuento</h2>
+                
+                <div class="portfolio-filters">
+                    <div class="search-group">
+                        <div class="search-field">
+                            <input type="text" 
+                                id="bankSearch" 
+                                list="banksList"
+                                placeholder="Buscar por banco..." 
+                                class="search-input">
+                            <datalist id="banksList">
+                                ${uniqueBanks.map(bank => `<option value="${bank}">`).join('')}
+                            </datalist>
+                        </div>
+
+                        <div class="search-field">
+                            <input type="number" 
+                                id="amountSearch" 
+                                list="amountsList"
+                                placeholder="Buscar por monto descontado..." 
+                                class="search-input" 
+                                step="0.01">
+                            <datalist id="amountsList">
+                                ${uniqueAmounts.map(amount => `<option value="${amount}">`).join('')}
+                            </datalist>
+                        </div>
+
+                        <input type="date" id="dateSearch" class="search-input">
+                    </div>
+                    <div class="sort-group">
+                        <select id="sortBy" class="sort-select">
+                            <option value="">Ordenar por...</option>
+                            <option value="date-desc">Más recientes primero</option>
+                            <option value="date-asc">Más antiguos primero</option>
+                            <option value="amount-desc">Mayor monto</option>
+                            <option value="amount-asc">Menor monto</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="portfolios-grid">
                     ${portfolios.map(portfolio => `
                         <div class="portfolio-card">
@@ -75,13 +119,150 @@ class PortfolioList {
             </div>
         `;
 
-        // Agregar event listeners para los selects de estado
-        portfolios.forEach(portfolio => {
-            const select = document.getElementById(`status-${portfolio._id}`);
-            if (select) {
-                select.addEventListener('change', (e) => this.updateStatus(portfolio._id, e.target.value));
+        // Agregar estilos específicos
+        const styles = `
+            .portfolio-filters {
+                margin-bottom: 2rem;
+                padding: 1rem;
+                background: var(--accent-color);
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
-        });
+
+            .search-group {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .search-input {
+                padding: 0.8rem;
+                border: 1px solid var(--primary-color);
+                border-radius: 4px;
+                font-size: 1rem;
+            }
+
+            .sort-group {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .sort-select {
+                padding: 0.8rem;
+                border: 1px solid var(--primary-color);
+                border-radius: 4px;
+                font-size: 1rem;
+                background: white;
+                min-width: 200px;
+            }
+
+            .search-field {
+                position: relative;
+                width: 100%;
+            }
+
+            .search-field input {
+                width: 100%;
+            }
+
+            datalist {
+                position: absolute;
+                max-height: 200px;
+                overflow-y: auto;
+                width: 100%;
+                background: white;
+                border: 1px solid var(--primary-color);
+                border-radius: 4px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                z-index: 1000;
+            }
+
+            datalist option {
+                padding: 0.5rem;
+                cursor: pointer;
+            }
+
+            datalist option:hover {
+                background-color: var(--accent-color);
+            }
+        `;
+
+        if (!document.getElementById('portfolio-list-styles')) {
+            const styleSheet = document.createElement('style');
+            styleSheet.id = 'portfolio-list-styles';
+            styleSheet.textContent = styles;
+            document.head.appendChild(styleSheet);
+        }
+
+        this.setupFilterListeners();
+    }
+
+    setupFilterListeners() {
+        const bankSearch = document.getElementById('bankSearch');
+        const amountSearch = document.getElementById('amountSearch');
+        const dateSearch = document.getElementById('dateSearch');
+        const sortBy = document.getElementById('sortBy');
+
+        const filterPortfolios = () => {
+            let filtered = [...this.portfolios];
+
+            // Filtrar por banco
+            if (bankSearch.value) {
+                const searchTerm = bankSearch.value.toLowerCase();
+                filtered = filtered.filter(p => 
+                    p.bankId.name.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Filtrar por monto
+            if (amountSearch.value) {
+                const searchAmount = parseFloat(amountSearch.value);
+                filtered = filtered.filter(p => 
+                    Math.abs(p.discountedAmount - searchAmount) < 0.01
+                );
+            }
+
+            // Filtrar por fecha
+            if (dateSearch.value) {
+                const searchDate = new Date(dateSearch.value).toISOString().split('T')[0];
+                filtered = filtered.filter(p => 
+                    new Date(p.discountDate).toISOString().split('T')[0] === searchDate
+                );
+            }
+
+            // Ordenar
+            if (sortBy.value) {
+                filtered.sort((a, b) => {
+                    switch(sortBy.value) {
+                        case 'date-desc':
+                            return new Date(b.createdAt) - new Date(a.createdAt);
+                        case 'date-asc':
+                            return new Date(a.createdAt) - new Date(b.createdAt);
+                        case 'amount-desc':
+                            return b.discountedAmount - a.discountedAmount;
+                        case 'amount-asc':
+                            return a.discountedAmount - b.discountedAmount;
+                        default:
+                            return 0;
+                    }
+                });
+            }
+
+            this.renderPortfolios(filtered);
+        };
+
+        // Debounce para evitar muchas actualizaciones
+        let timeout;
+        const debounce = (func) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(), 300);
+        };
+
+        bankSearch.addEventListener('input', () => debounce(filterPortfolios));
+        amountSearch.addEventListener('input', () => debounce(filterPortfolios));
+        dateSearch.addEventListener('change', filterPortfolios);
+        sortBy.addEventListener('change', filterPortfolios);
     }
 
     async updateStatus(portfolioId, status) {
