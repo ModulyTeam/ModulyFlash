@@ -44,18 +44,15 @@ class DocumentManager {
                     <input type="date" id="dueDate" required>
                     <select id="bankId">
                         <option value="">Seleccione un Banco (Opcional)</option>
-                        ${this.banks.map(bank => {
-                            const currencyText = bank.acceptedCurrencies[0] === 'BOTH' ? 
-                                'PEN y USD' : 
-                                bank.acceptedCurrencies[0] === 'PEN' ? 'PEN' : 'USD';
-                            return `<option value="${bank._id}">${bank.name} (${currencyText})</option>`;
-                        }).join('')}
+                        ${this.banks.map(bank => `<option value="${bank._id}">${bank.name}</option>`).join('')}
                     </select>
                     <select id="currency" required>
                         <option value="PEN">Soles (PEN)</option>
                         <option value="USD">Dólares (USD)</option>
                     </select>
-                    <input type="number" id="tcea" placeholder="TCEA (%)" step="0.01" required>
+                    <div id="documentRateInput">
+                        <input type="number" id="tcea" placeholder="TCEA (%)" step="0.01" required>
+                    </div>
                     <input type="number" id="unit" placeholder="Cantidad" required>
                     <input type="number" id="unitPrice" placeholder="Precio por Unidad" step="0.01" required>
                     <input type="text" id="status" placeholder="Estado" required>
@@ -123,6 +120,9 @@ class DocumentManager {
 
         this.setupFormListener();
         this.setupFilterListeners();
+
+        // Inicializar el input de tasa
+        RateInput.createRateInputGroup('documentRateInput');
     }
 
     setupFormListener() {

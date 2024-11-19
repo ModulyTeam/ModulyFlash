@@ -26,7 +26,9 @@ class BankManager {
                 <h2>Gestión de Bancos</h2>
                 <form id="bankForm">
                     <input type="text" id="bankName" placeholder="Nombre del Banco" required>
-                    <input type="number" id="discountRate" placeholder="Tasa de Descuento (%)" step="0.01" required>
+                    <div id="bankRateInput">
+                        <input type="number" id="discountRate" placeholder="Tasa de Descuento (%)" step="0.01" required>
+                    </div>
                     <select id="acceptedCurrencies" required>
                         <option value="PEN">Solo Soles (PEN)</option>
                         <option value="USD">Solo Dólares (USD)</option>
@@ -67,6 +69,7 @@ class BankManager {
         `;
 
         this.setupFormListener();
+        RateInput.createRateInputGroup('bankRateInput');
     }
 
     formatAcceptedCurrencies(currencies) {
