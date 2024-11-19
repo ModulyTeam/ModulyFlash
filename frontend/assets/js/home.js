@@ -49,32 +49,9 @@ class HomeManager {
                         </div>
                         <button type="submit">Cambiar Contraseña</button>
                     </form>
-                </div>
+                </div>               
 
-                <div class="quick-actions" data-intro="Acciones rápidas para comenzar" data-step="3">
-                    <h3>Acciones Rápidas</h3>
-                    <div class="actions-grid">
-                        <div class="action-card" data-intro="Gestiona tus documentos financieros" data-step="4">
-                            <h4>Documentos Financieros</h4>
-                            <p>Crea y administra tus facturas y letras</p>
-                            <button onclick="location.hash = '#documents'">Ir a Documentos</button>
-                        </div>
-                        <div class="action-card" data-intro="Configura tus bancos" data-step="5">
-                            <h4>Bancos</h4>
-                            <p>Gestiona tus bancos y tasas de descuento</p>
-                            <button onclick="location.hash = '#banks'">Ir a Bancos</button>
-                        </div>
-                        <div class="action-card" data-intro="Calcula tus carteras de descuento" data-step="6">
-                            <h4>Cartera de Descuento</h4>
-                            <p>Calcula el valor de tus documentos</p>
-                            <button onclick="location.hash = '#portfolio'">Ir a Cartera</button>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="startTutorial" class="tutorial-button" data-intro="¡Inicia el tutorial cuando quieras!" data-step="7">
-                    Iniciar Tutorial
-                </button>
+ 
             </div>
         `;
 

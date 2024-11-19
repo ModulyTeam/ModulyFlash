@@ -189,50 +189,102 @@ window.addEventListener('hashchange', handleRoute);
 window.addEventListener('load', handleRoute);
 
 function handleRoute() {
-    console.log('Manejando ruta:', window.location.pathname);
+    console.log('Manejando ruta:', window.location.hash);
     const content = document.getElementById('content');
-    const path = window.location.pathname;
+    const hash = window.location.hash || '#home';
 
     if (!content) {
         console.error('No se encontró el elemento content');
         return;
     }
 
+    // Limpiar listeners antiguos si existen
+    if (window.currentCleanup) {
+        window.currentCleanup();
+    }
+
     // Asegurarnos de que los managers existan
-    if (path === '/portfolio' && !window.portfolioManager) {
+    if (!window.portfolioManager && (hash === '#portfolio' || hash === '#')) {
         window.portfolioManager = new PortfolioManager();
     }
-    if (path === '/portfolios' && !window.portfolioList) {
+    if (!window.portfolioList && hash === '#portfolios') {
         window.portfolioList = new PortfolioList();
+    }
+    if (!window.rateConverter && hash === '#rate-converter') {
+        window.rateConverter = new RateConverter();
     }
 
     // Manejar rutas
-    switch(path) {
-        case '/portfolio':
+    switch(hash) {
+        case '#portfolio':
             if (window.portfolioManager) {
-                window.portfolioManager.loadPortfolio();
-            } else {
-                console.error('No se pudo inicializar portfolioManager');
+                window.portfolioManager.loadPortfolio().then(() => {
+                    // Remover listeners antiguos del botón continuar
+                    const continueButton = document.getElementById('continueToDocuments');
+                    if (continueButton) {
+                        const newButton = continueButton.cloneNode(true);
+                        continueButton.parentNode.replaceChild(newButton, continueButton);
+                        
+                        // Agregar nuevo listener
+                        newButton.addEventListener('click', () => {
+                            const currency = document.getElementById('portfolioCurrency').value;
+                            const bank = document.getElementById('portfolioBank').value;
+                            const docType = document.getElementById('portfolioDocType').value;
+
+                            if (!currency || !bank || !docType) {
+                                alert('Por favor complete todos los campos de configuración');
+                                return;
+                            }
+
+                            window.portfolioManager.loadFilteredDocuments(currency, bank, docType);
+                        });
+                    }
+
+                    // Configurar cleanup para la próxima navegación
+                    window.currentCleanup = () => {
+                        if (window.rateConverter) {
+                            window.rateConverter.unloadConverter();
+                        }
+                        // Aquí puedes agregar más limpiezas si son necesarias
+                    };
+
+                    window.portfolioManager.setupConfigListeners();
+                });
             }
             break;
-        case '/portfolios':
+        case '#portfolios':
             if (window.portfolioList) {
                 window.portfolioList.loadPortfolios();
-            } else {
-                console.error('No se pudo inicializar portfolioList');
             }
             break;
-        case '/documents':
+        case '#documents':
             documentManager.loadDocuments();
             break;
-        case '/banks':
+        case '#banks':
             bankManager.loadBanks();
             break;
-        case '/':
+        case '#rate-converter':
+            if (window.rateConverter) {
+                window.rateConverter.loadConverter();
+            }
+            break;
+        case '#home':
+        case '':
+            showWelcome();
+            break;
         default:
             showWelcome();
     }
 }
+
+// Actualizar los event listeners de navegación
+document.querySelectorAll('nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.dataset.section;
+        window.location.hash = section;
+    });
+});
 
 // Asegurarse de que el evento DOMContentLoaded maneje la ruta inicial
 document.addEventListener('DOMContentLoaded', () => {
@@ -241,4 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('main-section').style.display = 'block';
         handleRoute();
     }
-}); 
+});
+
+// Manejar cambios de ruta
+window.addEventListener('popstate', handleRoute); 
