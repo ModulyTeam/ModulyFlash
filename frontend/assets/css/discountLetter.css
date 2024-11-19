@@ -127,3 +127,64 @@
     line-height: 1.5;
     color: #333;
 }
+
+.letter-header h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.bank-info {
+    background-color: var(--accent-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.letter-details {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.documents-summary h4 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin: 2rem 0 1rem;
+}
+
+.signature-line {
+    text-align: center;
+    margin: 0 2rem;
+}
+
+.signature-line p:first-child {
+    border-top: 1px solid #000;
+    width: 200px;
+    margin: 0 auto;
+    padding-top: 0.5rem;
+}
+
+.signature-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.save-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-button:hover {
+    background: var(--tertiary-color);
+    transform: translateY(-2px);
+}

@@ -10,23 +10,24 @@ class DiscountLetter {
         const currency = results.details[0].currency;
         const totalDiscounted = results.details.reduce((sum, doc) => sum + doc.discountedValue, 0);
         const documentType = results.details[0].type || 'MIXTO';
+        const currencySymbol = currency === 'PEN' ? 'S/. ' : '$ ';
 
         content.innerHTML = `
             <div class="discount-letter-preview">
                 <div class="letter-header">
-                    <h2>Vista Previa - Letra de Descuento</h2>
+                    <h2>Acuerdo de Operación de Descuento</h2>
                     <div class="bank-info">
                         <h3>${bank}</h3>
-                        <p>Fecha: ${new Date().toLocaleDateString()}</p>
+                        <p>Fecha de Emisión: ${new Date().toLocaleDateString()}</p>
                     </div>
                 </div>
 
                 <div class="letter-body">
                     <div class="letter-details">
-                        <p><strong>Tipo de Cartera:</strong> ${documentType === 'FACTURA' ? 'Facturas' : documentType === 'LETRA' ? 'Letras' : 'Mixta'}</p>
-                        <p><strong>Moneda:</strong> ${currency}</p>
-                        <p><strong>Valor Total Descontado:</strong> ${currency === 'PEN' ? 'S/. ' : '$ '}${totalDiscounted.toFixed(2)}</p>
-                        <p><strong>Fecha de Descuento:</strong> ${new Date(results.selectedDate).toLocaleDateString()}</p>
+                        <p><strong>Modalidad de Cartera:</strong> ${documentType === 'FACTURA' ? 'Facturas Negociables' : documentType === 'LETRA' ? 'Letras de Cambio' : 'Instrumentos Mixtos'}</p>
+                        <p><strong>Moneda de Operación:</strong> ${currency === 'PEN' ? 'Soles (PEN)' : 'Dólares Americanos (USD)'}</p>
+                        <p><strong>Valor Presente Descontado Neto Total:</strong> ${currencySymbol}${totalDiscounted.toFixed(2)}</p>
+                        <p><strong>Fecha de Operación:</strong> ${new Date(results.selectedDate).toLocaleDateString()}</p>
                         
                         <div class="payment-description">
                             <pre>${results.paymentDescription}</pre>
@@ -34,15 +35,15 @@ class DiscountLetter {
                     </div>
 
                     <div class="documents-summary">
-                        <h4>Documentos en Cartera</h4>
+                        <h4>Detalle de Instrumentos Financieros</h4>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Documento</th>
-                                    <th>Emisión</th>
-                                    <th>Vencimiento</th>
-                                    <th>Valor Original</th>
-                                    <th>Valor Descontado</th>
+                                    <th>Instrumento</th>
+                                    <th>Fecha de Emisión</th>
+                                    <th>Fecha de Vencimiento</th>
+                                    <th>Valor Nominal</th>
+                                    <th>Valor Presente Neto</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,8 +52,8 @@ class DiscountLetter {
                                         <td>${doc.documentCode}</td>
                                         <td>${new Date(doc.emissionDate).toLocaleDateString()}</td>
                                         <td>${new Date(doc.dueDate).toLocaleDateString()}</td>
-                                        <td>${currency === 'PEN' ? 'S/. ' : '$ '}${doc.originalAmount.toFixed(2)}</td>
-                                        <td>${currency === 'PEN' ? 'S/. ' : '$ '}${doc.discountedValue.toFixed(2)}</td>
+                                        <td>${currencySymbol}${doc.originalAmount.toFixed(2)}</td>
+                                        <td>${currencySymbol}${doc.discountedValue.toFixed(2)}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -63,11 +64,13 @@ class DiscountLetter {
                         <div class="signatures">
                             <div class="signature-line">
                                 <p>____________________</p>
-                                <p>Firma del Cliente</p>
+                                <p>El Cliente</p>
+                                <p class="signature-subtitle">Cedente</p>
                             </div>
                             <div class="signature-line">
                                 <p>____________________</p>
-                                <p>Firma del Banco</p>
+                                <p>La Entidad Financiera</p>
+                                <p class="signature-subtitle">Cesionario</p>
                             </div>
                         </div>
                     </div>
@@ -76,7 +79,7 @@ class DiscountLetter {
                 <div class="action-buttons">
                     <button onclick="history.back()" class="back-button">Volver</button>
                     <button onclick="DiscountLetter.savePortfolio(window.tempPortfolioResults)" class="save-button">
-                        Guardar Cartera
+                        Formalizar Operación
                     </button>
                 </div>
             </div>
@@ -85,36 +88,25 @@ class DiscountLetter {
 
     static async savePortfolio(results) {
         try {
-            console.log('Resultados:', results); // Para debug
-
-            // Determinar el tipo de cartera basado en los documentos
-            const types = [...new Set(results.details.map(doc => doc.type))];
-            const portfolioType = types.length > 1 ? 'MIXTA' : types[0];
-
-            // Generar el PDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // Configuración inicial
             doc.setFontSize(20);
-            doc.text(`CARTERA DE ${portfolioType === 'FACTURA' ? 'FACTURAS' : portfolioType === 'LETRA' ? 'LETRAS' : 'MIXTA'}`, 105, 20, { align: 'center' });
+            doc.text('ACUERDO DE OPERACIÓN DE DESCUENTO', 105, 20, { align: 'center' });
             
-            // Información del banco y fecha
             doc.setFontSize(14);
             doc.text(results.details[0].bank, 20, 40);
-            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 50);
+            doc.text(`Fecha de Emisión: ${new Date().toLocaleDateString()}`, 20, 50);
             
-            // Agregar el acuerdo
             doc.setFontSize(12);
-            const paymentDescription = results.paymentDescription;
-            const splitDescription = doc.splitTextToSize(paymentDescription, 170);
-            doc.text(splitDescription, 20, 70);
-
-            // Agregar tabla de documentos
-            const tableY = doc.getTextDimensions(splitDescription).h + 90;
+            doc.text(`Modalidad de Cartera: ${results.details[0].type === 'FACTURA' ? 'Facturas Negociables' : 'Letras de Cambio'}`, 20, 70);
+            doc.text(`Moneda de Operación: ${results.details[0].currency === 'PEN' ? 'Soles (PEN)' : 'Dólares Americanos (USD)'}`, 20, 80);
+            doc.text(`Valor Presente Descontado Neto Total: ${results.details[0].currency === 'PEN' ? 'S/. ' : '$ '}${results.details.reduce((sum, doc) => sum + doc.discountedValue, 0).toFixed(2)}`, 20, 90);
+            doc.text(`Fecha de Operación: ${new Date(results.selectedDate).toLocaleDateString()}`, 20, 100);
+            
             doc.autoTable({
-                startY: tableY,
-                head: [['Documento', 'Emisión', 'Vencimiento', 'Valor Original', 'Valor Descontado']],
+                startY: 120,
+                head: [['Instrumento', 'Emisión', 'Vencimiento', 'Valor Nominal', 'Valor Presente']],
                 body: results.details.map(doc => [
                     doc.documentCode,
                     new Date(doc.emissionDate).toLocaleDateString(),
@@ -124,42 +116,37 @@ class DiscountLetter {
                 ]),
                 theme: 'grid',
                 styles: { fontSize: 10 },
-                headStyles: { fillColor: [44, 62, 80] }
+                headStyles: { fillColor: [24, 71, 140] }
             });
-
-            // Agregar firmas
+            
             const finalY = doc.lastAutoTable.finalY + 50;
             doc.line(20, finalY, 90, finalY);
             doc.line(120, finalY, 190, finalY);
-            doc.text('Firma del Cliente', 40, finalY + 10);
-            doc.text('Firma del Banco', 140, finalY + 10);
-            
-            // Convertir el PDF a blob
+            doc.text('El Cliente (Cedente)', 35, finalY + 10);
+            doc.text('La Entidad Financiera (Cesionario)', 125, finalY + 10);
+
             const pdfBlob = doc.output('blob');
 
-            // Crear FormData para enviar el archivo
             const formData = new FormData();
             formData.append('pdf', pdfBlob, 'cartera.pdf');
             formData.append('bankId', results.bankId);
-            formData.append('type', portfolioType);
+            formData.append('type', results.details[0].type);
             formData.append('currency', results.details[0].currency);
             formData.append('totalAmount', results.details.reduce((sum, doc) => sum + doc.originalAmount, 0));
             formData.append('discountedAmount', results.details.reduce((sum, doc) => sum + doc.discountedValue, 0));
             formData.append('interestAmount', results.details.reduce((sum, doc) => sum + (doc.amountToDiscount - doc.discountedValue), 0));
             formData.append('discountDate', results.selectedDate);
 
-            // Modificar la estructura de los documentos para incluir documentId
             const documentsData = results.details.map(doc => ({
-                documentId: doc.documentId,  // Ahora este campo existe en los resultados
+                documentId: doc.documentId,  
                 originalAmount: doc.originalAmount,
                 discountedAmount: doc.discountedValue
             }));
 
-            console.log('Documentos a enviar:', documentsData); // Para debug
+            console.log('Documentos a enviar:', documentsData); 
 
             formData.append('documents', JSON.stringify(documentsData));
 
-            // Guardar en la base de datos
             const response = await fetch(`${API_URL}/portfolios`, {
                 method: 'POST',
                 headers: {
@@ -176,11 +163,10 @@ class DiscountLetter {
             const savedPortfolio = await response.json();
             alert('Cartera guardada exitosamente');
 
-            // Redirigir a la vista de carteras
             window.location.href = '#portfolios';
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message || 'Error al guardar la cartera. Por favor, intente nuevamente.');
+            alert('Error al generar y guardar la cartera');
         }
     }
 } 

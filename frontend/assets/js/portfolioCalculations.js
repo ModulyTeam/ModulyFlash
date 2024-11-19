@@ -1,46 +1,47 @@
 class PortfolioCalculations {
-    static renderCurrencyResults(currency, docs, totals) {
+    static renderCurrencyResults(currency, documents, totals) {
         const currencySymbol = currency === 'PEN' ? 'S/. ' : '$ ';
-        const currencyName = currency === 'PEN' ? 'Soles' : 'Dólares';
-
-        if (docs.length === 0) return '';
-
         return `
             <div class="currency-results">
-                <h4>Documentos en ${currencyName} (${currency})</h4>
-                <div class="results-summary">
-                    <p><strong>Monto Original Total:</strong> ${currencySymbol}${totals.originalAmount.toFixed(2)}</p>
-                    <p><strong>Valor Futuro Total:</strong> ${currencySymbol}${totals.futureValue.toFixed(2)}</p>
-                    <p><strong>Valor Descontado Total:</strong> ${currencySymbol}${totals.discountedValue.toFixed(2)}</p>
-                </div>
+                <h4>Resultados en ${currency === 'PEN' ? 'Soles' : 'Dólares'}</h4>
                 <table>
                     <thead>
                         <tr>
-                            <th>Código</th>
-                            <th>Banco</th>
-                            <th>Monto Original</th>
+                            <th>Documento</th>
+                            <th>Valor Nominal</th>
                             <th>Valor Futuro</th>
-                            <th>Valor Descontado</th>
+                            <th>Valor Presente Neto</th>
+                            <th>Tasa Efectiva</th>
+                            <th>Plazo (días)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${docs.map(detail => `
+                        ${documents.map(doc => `
                             <tr>
-                                <td>${detail.documentCode}</td>
-                                <td>${detail.bank}</td>
-                                <td>${currencySymbol}${detail.originalAmount.toFixed(2)}</td>
-                                <td>${currencySymbol}${detail.futureValue.toFixed(2)}</td>
-                                <td>${currencySymbol}${detail.discountedValue.toFixed(2)}</td>
+                                <td>${doc.documentCode}</td>
+                                <td>${currencySymbol}${doc.originalAmount.toFixed(2)}</td>
+                                <td>${currencySymbol}${doc.futureValue.toFixed(2)}</td>
+                                <td>${currencySymbol}${doc.discountedValue.toFixed(2)}</td>
+                                <td>${doc.tcea}%</td>
+                                <td>${doc.daysToMaturity}</td>
                             </tr>
                         `).join('')}
                         <tr class="totals-row">
-                            <td colspan="2"><strong>Totales</strong></td>
-                            <td><strong>${currencySymbol}${totals.originalAmount.toFixed(2)}</strong></td>
-                            <td><strong>${currencySymbol}${totals.futureValue.toFixed(2)}</strong></td>
-                            <td><strong>${currencySymbol}${totals.discountedValue.toFixed(2)}</strong></td>
+                            <td>Totales</td>
+                            <td>${currencySymbol}${totals.originalAmount.toFixed(2)}</td>
+                            <td>${currencySymbol}${totals.futureValue.toFixed(2)}</td>
+                            <td>${currencySymbol}${totals.discountedValue.toFixed(2)}</td>
+                            <td>-</td>
+                            <td>-</td>
                         </tr>
                     </tbody>
                 </table>
+                <div class="results-summary">
+                    <p><strong>Valor Nominal Total:</strong> ${currencySymbol}${totals.originalAmount.toFixed(2)}</p>
+                    <p><strong>Valor Presente Neto Total:</strong> ${currencySymbol}${totals.discountedValue.toFixed(2)}</p>
+                    <p><strong>Interés por Devengar:</strong> ${currencySymbol}${(totals.futureValue - totals.originalAmount).toFixed(2)}</p>
+                    <p><strong>Descuento Aplicado:</strong> ${currencySymbol}${(totals.futureValue - totals.discountedValue).toFixed(2)}</p>
+                </div>
             </div>
         `;
     }

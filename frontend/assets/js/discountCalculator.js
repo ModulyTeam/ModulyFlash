@@ -35,7 +35,6 @@ class DiscountCalculator {
                 break;
         }
 
-        // Cálculo del valor descontado
         const discountedValue = amountToDiscount / Math.pow(1 + (discountRate/100), daysFromSelectedToMaturity/365);
 
         return {

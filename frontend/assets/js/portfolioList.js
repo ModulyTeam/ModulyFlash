@@ -80,7 +80,7 @@ class PortfolioList {
 
                 <div class="portfolios-grid">
                     ${portfolios.map(portfolio => `
-                        <div class="portfolio-card">
+                        <div class="portfolio-card" data-portfolio-id="${portfolio._id}">
                             <div class="portfolio-header">
                                 <h3>${portfolio.bankId.name}</h3>
                                 <span class="status-badge ${portfolio.status.toLowerCase()}">${portfolio.status}</span>
@@ -97,15 +97,13 @@ class PortfolioList {
                                 <button class="download-button" onclick="portfolioList.downloadPdf('${portfolio._id}')">
                                     Descargar PDF
                                 </button>
-                                ${['APROBADA', 'COMPLETADA'].includes(portfolio.status) ? `
-                                    <div class="upload-container">
-                                        <input type="file" id="pdf-${portfolio._id}" accept=".pdf" style="display: none;"
-                                            onchange="portfolioList.handlePdfUpload('${portfolio._id}', this.files[0])">
-                                        <button class="upload-button" onclick="document.getElementById('pdf-${portfolio._id}').click()">
-                                            Actualizar PDF
-                                        </button>
-                                    </div>
-                                ` : ''}
+                                <div class="upload-container" style="display: ${['APROBADA', 'COMPLETADA'].includes(portfolio.status) ? 'block' : 'none'}">
+                                    <input type="file" id="pdf-${portfolio._id}" accept=".pdf" style="display: none;"
+                                        onchange="portfolioList.handlePdfUpload('${portfolio._id}', this.files[0])">
+                                    <button class="upload-button" onclick="document.getElementById('pdf-${portfolio._id}').click()">
+                                        Actualizar PDF
+                                    </button>
+                                </div>
                                 <button class="info-button" onclick="portfolioList.showDetails('${portfolio._id}')">
                                     Más Información
                                 </button>
@@ -360,11 +358,20 @@ class PortfolioList {
                 throw new Error('Error al actualizar el PDF');
             }
 
-            alert('PDF actualizado exitosamente');
-            this.loadPortfolios(); // Recargar la lista
+            // Mostrar mensaje de éxito
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-success';
+            toast.textContent = 'PDF actualizado exitosamente';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+
         } catch (error) {
             console.error('Error:', error);
-            alert('Error al actualizar el PDF. Por favor, intente nuevamente.');
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-error';
+            toast.textContent = 'Error al actualizar el PDF';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
     }
 
@@ -540,7 +547,10 @@ class PortfolioList {
     renderStatusSelect(portfolio) {
         const options = ['PENDIENTE', 'APROBADA', 'RECHAZADA', 'EN_PROCESO', 'COMPLETADA'];
         return `
-            <select id="status-${portfolio._id}" class="status-select">
+            <select 
+                id="status-${portfolio._id}" 
+                class="status-select" 
+                onchange="portfolioList.handleStatusChange('${portfolio._id}', this.value)">
                 ${options.map(option => `
                     <option value="${option}" ${portfolio.status === option ? 'selected' : ''}>
                         ${option}
@@ -548,6 +558,63 @@ class PortfolioList {
                 `).join('')}
             </select>
         `;
+    }
+
+    async handleStatusChange(portfolioId, newStatus) {
+        try {
+            const response = await fetch(`${API_URL}/portfolios/${portfolioId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al actualizar el estado');
+            }
+
+            const updatedPortfolio = await response.json();
+
+            // Actualizar la UI en tiempo real
+            const portfolioCard = document.querySelector(`[data-portfolio-id="${portfolioId}"]`);
+            if (portfolioCard) {
+                // Actualizar el badge de estado
+                const statusBadge = portfolioCard.querySelector('.status-badge');
+                if (statusBadge) {
+                    statusBadge.className = `status-badge ${newStatus.toLowerCase()}`;
+                    statusBadge.textContent = newStatus;
+                }
+
+                // Actualizar el select de estado
+                const statusSelect = portfolioCard.querySelector('.status-select');
+                if (statusSelect) {
+                    statusSelect.value = newStatus;
+                }
+
+                // Actualizar la visibilidad del botón de actualizar PDF
+                const uploadContainer = portfolioCard.querySelector('.upload-container');
+                if (uploadContainer) {
+                    uploadContainer.style.display = ['APROBADA', 'COMPLETADA'].includes(newStatus) ? 'block' : 'none';
+                }
+            }
+
+            // Mostrar mensaje de éxito
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-success';
+            toast.textContent = 'Estado actualizado correctamente';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+
+        } catch (error) {
+            console.error('Error:', error);
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-error';
+            toast.textContent = 'Error al actualizar el estado de la cartera';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
     }
 }
 

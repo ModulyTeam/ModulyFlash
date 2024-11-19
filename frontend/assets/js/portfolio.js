@@ -410,33 +410,33 @@ class PortfolioManager {
                                 <h5>Documento: ${detail.documentCode}</h5>
                                 <div class="calculation-steps">
                                     <div class="step">
-                                        <h6>1. Cálculo del Monto Original:</h6>
-                                        <p class="formula">Monto = Unidades × Precio Unitario</p>
+                                        <h6>1. Valor Nominal:</h6>
+                                        <p class="formula">Valor Nominal = Cantidad × Valor Unitario</p>
                                         <p class="formula">${detail.unit} × ${currencySymbol}${detail.unitPrice} = ${currencySymbol}${detail.originalAmount.toFixed(2)}</p>
                                     </div>
                                     
                                     <div class="step">
-                                        <h6>2. Cálculo del Valor Futuro al Vencimiento:</h6>
-                                        <p class="formula">VF = Monto × (1 + TCEA)^(días/360)</p>
+                                        <h6>2. Valor Futuro Capitalizado:</h6>
+                                        <p class="formula">VF = Valor Nominal × (1 + TCEA)^(días/360)</p>
                                         <p class="formula">${currencySymbol}${detail.originalAmount.toFixed(2)} × (1 + ${detail.tcea}%)^(${detail.daysToMaturity}/${daysInYear})</p>
                                         <p class="formula">${currencySymbol}${detail.originalAmount.toFixed(2)} × ${tceaPower.toFixed(6)}</p>
                                         <p class="result">= ${currencySymbol}${detail.futureValue.toFixed(2)}</p>
                                     </div>
 
                                     <div class="step">
-                                        <h6>3. Cálculo del Valor Descontado:</h6>
-                                        <p class="formula">VD = Monto Base ÷ (1 + Tasa)^(días/360)</p>
+                                        <h6>3. Valor Presente Neto:</h6>
+                                        <p class="formula">VPN = Valor Base ÷ (1 + Tasa)^(días/360)</p>
                                         <p class="formula">${currencySymbol}${detail.amountToDiscount.toFixed(2)} ÷ (1 + ${detail.discountRate}%)^(${detail.daysFromSelectedToMaturity}/${daysInYear})</p>
                                         <p class="formula">${currencySymbol}${detail.amountToDiscount.toFixed(2)} ÷ ${discountPower.toFixed(6)}</p>
                                         <p class="result">= ${currencySymbol}${detail.discountedValue.toFixed(2)}</p>
                                     </div>
 
                                     <div class="summary">
-                                        <p><strong>Días hasta el vencimiento:</strong> ${detail.daysToMaturity}</p>
-                                        <p><strong>Días desde emisión hasta fecha seleccionada:</strong> ${detail.daysToSelected}</p>
-                                        <p><strong>Días desde fecha seleccionada hasta vencimiento:</strong> ${detail.daysFromSelectedToMaturity}</p>
-                                        <p><strong>Tasa TCEA:</strong> ${detail.tcea}%</p>
-                                        <p><strong>Tasa de Descuento:</strong> ${detail.discountRate}%</p>
+                                        <p><strong>Plazo hasta vencimiento:</strong> ${detail.daysToMaturity} días</p>
+                                        <p><strong>Periodo transcurrido:</strong> ${detail.daysToSelected} días</p>
+                                        <p><strong>Periodo por transcurrir:</strong> ${detail.daysFromSelectedToMaturity} días</p>
+                                        <p><strong>Tasa Efectiva Anual:</strong> ${detail.tcea}%</p>
+                                        <p><strong>Tasa de Descuento Efectiva:</strong> ${detail.discountRate}%</p>
                                     </div>
                                 </div>
                             </div>

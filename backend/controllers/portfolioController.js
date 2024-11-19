@@ -94,10 +94,14 @@ exports.updatePortfolioStatus = async (req, res) => {
     try {
         const { status } = req.body;
         const portfolio = await Portfolio.findOneAndUpdate(
-            { _id: req.params.id, userId: req.user.userId },
+            {
+                _id: req.params.id,
+                userId: req.user.userId
+            },
             { status },
             { new: true }
-        );
+        ).populate('bankId', 'name')
+         .populate('documents.documentId', 'code type');
 
         if (!portfolio) {
             return res.status(404).json({ message: 'Cartera no encontrada' });
@@ -105,6 +109,7 @@ exports.updatePortfolioStatus = async (req, res) => {
 
         res.json(portfolio);
     } catch (error) {
+        console.error('Error al actualizar estado:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -194,7 +199,10 @@ exports.updatePdf = async (req, res) => {
         portfolio.pdfUrl = `/uploads/portfolios/${pdfName}`;
         await portfolio.save();
 
-        res.json({ message: 'PDF actualizado exitosamente' });
+        res.json({ 
+            message: 'PDF actualizado exitosamente',
+            newPdfUrl: portfolio.pdfUrl
+        });
     } catch (error) {
         console.error('Error al actualizar PDF:', error);
         res.status(500).json({ message: error.message });
