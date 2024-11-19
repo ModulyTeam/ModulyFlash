@@ -339,6 +339,9 @@ class PortfolioManager {
 
         let resultsHTML = `
             <div class="results-section">
+                <button type="button" class="generate-letter-buttonmain" id="generateLetterBtn">
+                    Generar Letra de Descuento
+                </button>
                 <h3>Resultados del Cálculo</h3>
                 <p class="calculation-date">Fecha de descuento: ${new Date(results.selectedDate).toLocaleDateString()}</p>
                 
