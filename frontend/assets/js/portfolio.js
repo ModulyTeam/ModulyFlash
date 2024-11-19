@@ -274,31 +274,71 @@ class PortfolioManager {
     }
 
     async calculatePortfolio() {
-        const selectedDate = document.getElementById('selectedDate').value;
-        const selectedDocs = Array.from(document.querySelectorAll('input[name="selectedDocs"]:checked'));
-        const calculationMethod = document.querySelector('input[name="calculationMethod"]:checked');
-        const daysInYear = CalculationConfig.getDaysInYear();
-
-        if (!selectedDate) {
-            alert('Por favor seleccione una fecha de descuento');
-            return;
-        }
-
-        if (selectedDocs.length === 0) {
-            alert('Por favor seleccione al menos un documento');
-            return;
-        }
-
-        if (!calculationMethod) {
-            alert('Por favor seleccione un método de cálculo');
-            return;
-        }
-
         try {
+            const selectedDocs = document.querySelectorAll('input[name="selectedDocs"]:checked');
+            if (selectedDocs.length === 0) {
+                this.showToast('Por favor seleccione al menos un documento', 'error');
+                return;
+            }
+
+            const selectedDate = document.getElementById('selectedDate').value;
+            if (!selectedDate) {
+                this.showToast('Por favor seleccione una fecha de descuento', 'error');
+                return;
+            }
+
+            // Validar fecha de descuento contra documentos seleccionados
+            const selectedDateObj = new Date(selectedDate);
+            let hasDateError = false;
+            let errorMessages = [];
+
+            selectedDocs.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const emissionDate = new Date(row.cells[3].textContent);
+                const dueDate = new Date(row.cells[4].textContent);
+                const docCode = row.cells[1].textContent;
+
+                if (selectedDateObj < emissionDate) {
+                    errorMessages.push(`La fecha de descuento es anterior a la fecha de emisión del documento ${docCode}`);
+                    hasDateError = true;
+                }
+                if (selectedDateObj > dueDate) {
+                    errorMessages.push(`La fecha de descuento es posterior a la fecha de vencimiento del documento ${docCode}`);
+                    hasDateError = true;
+                }
+            });
+
+            // Mostrar errores si existen
+            const existingError = document.querySelector('.validation-errors');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            if (hasDateError) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'validation-errors';
+                errorDiv.innerHTML = `
+                    <div class="error-message">
+                        <h4>⚠️ Error en fecha de descuento:</h4>
+                        <ul>
+                            ${errorMessages.map(msg => `<li>${msg}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                document.getElementById('calculateButton').before(errorDiv);
+                
+                // Mostrar también como toast
+                this.showToast(errorMessages[0], 'error');
+                return;
+            }
+
+            // Continuar con el cálculo existente si no hay errores
+            const calculationType = document.querySelector('input[name="calculationMethod"]:checked').value;
+            const daysInYear = document.querySelector('input[name="daysConfig"]:checked').value;
             const bankId = document.getElementById('portfolioBank').value;
-            const documentData = selectedDocs.map(checkbox => ({
-                documentId: checkbox.value,
-                customDiscountRate: null
+
+            const selectedDocuments = Array.from(selectedDocs).map(checkbox => ({
+                documentId: checkbox.value
             }));
 
             const response = await fetch(`${API_URL}/documents/calculate-portfolio`, {
@@ -309,23 +349,24 @@ class PortfolioManager {
                 },
                 body: JSON.stringify({
                     selectedDate,
-                    documents: documentData,
-                    calculationType: calculationMethod.value,
+                    documents: selectedDocuments,
+                    calculationType,
                     daysInYear,
                     bankId
                 })
             });
 
             if (!response.ok) {
-                throw new Error('Error al calcular la cartera');
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             const results = await response.json();
-            results.bankId = bankId;
             this.displayResults(results);
+
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message || 'Error al calcular la cartera');
+            this.showToast(error.message || 'Error al calcular la cartera', 'error');
         }
     }
 
@@ -403,10 +444,6 @@ class PortfolioManager {
                     }).join('')}
                 </div>
 
-                <!-- Solo el botón de generar letra de descuento -->
-                <button type="button" class="generate-letter-button" id="generateLetterBtn">
-                    Generar Letra de Descuento
-                </button>
             </div>
         `;
 
@@ -414,7 +451,6 @@ class PortfolioManager {
         resultsContainer.style.display = 'block';
         resultsContainer.scrollIntoView({ behavior: 'smooth' });
 
-        // Agregar el event listener después de crear el botón
         document.getElementById('generateLetterBtn').addEventListener('click', () => {
             if (typeof DiscountLetter === 'undefined') {
                 console.error('DiscountLetter no está definido. Asegúrese de que discountLetter.js está cargado.');
@@ -431,9 +467,36 @@ class PortfolioManager {
             }
         });
     }
+
+    // Método para mostrar toast
+    showToast(message, type = 'info') {
+        // Remover toast anterior si existe
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                ${type === 'error' ? '⚠️' : 'ℹ️'} ${message}
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Animar entrada
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        // Remover después de 5 segundos
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
 }
 
-// Asegurarnos de que la instancia se cree después de que el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
     window.portfolioManager = new PortfolioManager();
 }); 

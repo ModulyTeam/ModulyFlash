@@ -244,3 +244,64 @@
     background-color: var(--accent-color);
     font-weight: bold;
 }
+
+.validation-errors {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #fff3f3;
+    border: 1px solid #ff4d4d;
+}
+
+.error-message {
+    color: #d63031;
+}
+
+.error-message h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: #d63031;
+}
+
+.error-message li {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    background-color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast-error {
+    background-color: #fff3f3;
+    border-left: 4px solid #ff4d4d;
+}
+
+.toast-info {
+    background-color: #e3f2fd;
+    border-left: 4px solid #1a73e8;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+}

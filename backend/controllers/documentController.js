@@ -40,17 +40,49 @@ exports.calculatePortfolio = async (req, res) => {
         // Obtener el banco seleccionado una sola vez
         const bank = await Bank.findById(bankId);
         if (!bank) {
-            throw new Error('Banco no encontrado');
+            return res.status(400).json({ message: 'Banco no encontrado' });
         }
 
-        const calculations = await Promise.all(documents.map(async (docData) => {
-            const doc = await Document.findOne({
+        // Validar fechas de forma correcta
+        const selectedDateObj = new Date(selectedDate);
+        
+        // Obtener todos los documentos primero
+        const documentDetails = await Promise.all(documents.map(docData => 
+            Document.findOne({
                 _id: docData.documentId,
                 userId: req.user.userId
+            })
+        ));
+
+        // Validar que todos los documentos existan
+        if (documentDetails.some(doc => !doc)) {
+            return res.status(400).json({ message: 'Uno o más documentos no fueron encontrados' });
+        }
+
+        // Validar fechas
+        const invalidDocument = documentDetails.find(doc => {
+            const emissionDate = new Date(doc.emissionDate);
+            const dueDate = new Date(doc.dueDate);
+            const isInvalid = selectedDateObj < emissionDate || selectedDateObj > dueDate;
+            
+            if (isInvalid) {
+                return {
+                    code: doc.code,
+                    emissionDate: emissionDate.toLocaleDateString(),
+                    dueDate: dueDate.toLocaleDateString()
+                };
+            }
+            return false;
+        });
+
+        if (invalidDocument) {
+            return res.status(400).json({
+                message: `La fecha de descuento (${selectedDate}) debe estar entre la fecha de emisión (${invalidDocument.emissionDate}) y vencimiento (${invalidDocument.dueDate}) del documento ${invalidDocument.code}`
             });
+        }
 
-            if (!doc) throw new Error(`Documento no encontrado: ${docData.documentId}`);
-
+        // Continuar con los cálculos existentes
+        const calculations = await Promise.all(documentDetails.map(async (doc) => {
             const originalAmount = doc.unit * doc.unitPrice;
             const daysToMaturity = Math.floor((new Date(doc.dueDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
             const daysToSelected = Math.floor((new Date(selectedDate) - new Date(doc.emissionDate)) / (1000 * 60 * 60 * 24));
